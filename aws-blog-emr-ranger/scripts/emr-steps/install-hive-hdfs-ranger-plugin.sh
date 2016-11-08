@@ -5,12 +5,20 @@ set -x
 export JAVA_HOME=/usr/lib/jvm/java-openjdk
 sudo -E bash -c 'echo $JAVA_HOME'
 installpath=/usr/lib/ranger
-ranger_fqdn=$1
-mysql_jar=mysql-connector-java-5.1.39-bin.jar
-mysql_jar_location=s3://security-poc/mysql
-ranger_s3bucket=s3://security-poc/ranger/ranger-0.5
-ranger_hdfs_plugin=ranger-0.5.3-hdfs-plugin
-ranger_hive_plugin=ranger-0.5.3-hive-plugin
+mysql_jar_location=http://central.maven.org/maven2/mysql/mysql-connector-java/5.1.39/mysql-connector-java-5.1.39.jar
+ranger_version=$2
+if [ "$ranger_version" == "0.6" ]; then
+   ranger_s3bucket=s3://security-poc/ranger/ranger-0.6.1
+   ranger_hdfs_plugin=ranger-0.6.1-hdfs-plugin
+   ranger_hive_plugin=ranger-0.6.1-hive-plugin
+else
+   ranger_s3bucket=s3://security-poc/ranger/ranger-0.5
+   ranger_hdfs_plugin=ranger-0.5.3-hdfs-plugin
+   ranger_hive_plugin=ranger-0.5.3-hive-plugin
+fi
+#ranger_s3bucket=s3://security-poc/ranger/ranger-0.5
+#ranger_hdfs_plugin=ranger-0.5.3-hdfs-plugin
+#ranger_hive_plugin=ranger-0.5.3-hive-plugin
 #ranger_s3bucket=s3://security-poc/ranger/ranger-0.6
 #ranger_hdfs_plugin=ranger-0.6.0-SNAPSHOT-hdfs-plugin
 #ranger_hive_plugin=ranger-0.6.0-SNAPSHOT-hive-plugin
@@ -19,7 +27,7 @@ sudo rm -rf $installpath
 sudo mkdir -p $installpath/hadoop
 sudo chmod -R 777 $installpath
 cd $installpath
-aws s3 cp $mysql_jar_location/$mysql_jar .
+wget $mysql_jar_location
 aws s3 cp $ranger_s3bucket/$ranger_hdfs_plugin.tar.gz .
 aws s3 cp $ranger_s3bucket/$ranger_hive_plugin.tar.gz .
 tar -xvf $ranger_hdfs_plugin.tar.gz
@@ -70,3 +78,6 @@ sudo puppet apply -e 'service { "hadoop-hdfs-namenode": ensure => true, }'
 #Restart HiveServer2
 sudo puppet apply -e 'service { "hive-server2": ensure => false, }'
 sudo puppet apply -e 'service { "hive-server2": ensure => true, }'
+sudo sed -i '/hive.server2.logging.operation.verbose/s/kwargs/#kwargs/g' /usr/lib/hue/apps/beeswax/src/beeswax/server/hive_server2_lib.py
+sudo puppet apply -e 'service { "hue": ensure => false, }'
+sudo puppet apply -e 'service { "hue": ensure => true, }'

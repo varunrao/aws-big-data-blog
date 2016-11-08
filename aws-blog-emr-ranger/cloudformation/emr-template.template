@@ -216,7 +216,10 @@
                 "ActionOnFailure": "CONTINUE",
                 "HadoopJarStep": {
                     "Args": [
-                        "/tmp/aws-blog-emr-ranger/emr-steps/createHiveTables.sh"
+                        "/tmp/aws-blog-emr-ranger/emr-steps/createHiveTables.sh",
+                        { 
+                          "Ref" : "AWS::Region" 
+                        }
                     ],
                     "Jar": "s3://elasticmapreduce/libs/script-runner/script-runner.jar",
                     "MainClass": ""
@@ -276,7 +279,10 @@
                 "ActionOnFailure": "CONTINUE",
                 "HadoopJarStep": {
                     "Args": [
-                        "/tmp/aws-blog-emr-ranger/emr-steps/loadDataIntoHDFS.sh"
+                        "/tmp/aws-blog-emr-ranger/emr-steps/loadDataIntoHDFS.sh",
+                        { 
+                          "Ref" : "AWS::Region" 
+                        }
                     ],
                     "Jar": "s3://elasticmapreduce/libs/script-runner/script-runner.jar",
                     "MainClass": ""
