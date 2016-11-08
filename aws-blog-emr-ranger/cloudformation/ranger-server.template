@@ -108,7 +108,12 @@
             "Default": "s3://test-emr-security",
             "Description": "Default location where the artifacts are placed.",
             "Type": "String"
-     }
+     },
+     "gitRepo": {
+            "Default": "https://github.com/varunrao/aws-big-data-blog/trunk/aws-blog-emr-ranger",
+            "Description": "Git Repo URL path.",
+            "Type": "String"
+        }
   },
   "Mappings" : {
     "AWSInstanceType2Arch" : {
@@ -337,11 +342,13 @@
               [
                 "#!/bin/bash\n",
                 "cd /tmp\n",
-                "sudo yum -y install svn\n",
-                "svn export ", 
+                "wget ", 
                 	{"Ref": "downloadScriptLocation"},
-                 "aws-blog-emr-ranger\n",
-                "yum update aws-cfn-bootstrap\n",
+                 "\n",
+                "bash download-scripts.sh ",
+                	{"Ref": "gitRepo"},
+                 "\n",
+                 "yum update aws-cfn-bootstrap\n",
                  "# Install the files and packages from the metadata\n",
                  "/opt/aws/bin/cfn-init ",
                  "         --stack ", { "Ref" : "AWS::StackName" },
