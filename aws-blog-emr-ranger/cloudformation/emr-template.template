@@ -82,7 +82,15 @@
                         "Name": "Hue"
                     }
                 ],
-                "BootstrapActions": [],
+                "BootstrapActions": [
+                    {
+                        "Name": "Install SSM Plugin",
+                        "ScriptBootstrapAction": {
+                            "Path": "s3://test-emr-security/scripts/download-scripts.sh",
+                            "Args": ["https://github.com/varunrao/aws-big-data-blog/trunk/aws-blog-emr-ranger"]
+                        }
+                    }
+                ],
                 "Configurations": [
                     {
                         "Classification": "hue-ini",
@@ -194,23 +202,6 @@
             },
             "Type": "AWS::EMR::Cluster"
         },
-        "DownloadScripts": {
-            "Properties": {
-                "ActionOnFailure": "CONTINUE",
-                "HadoopJarStep": {
-                    "Args": [
-                        "sudo yum -y install svn; cd /tmp; svn export https://github.com/varunrao/aws-big-data-blog/trunk/aws-blog-emr-ranger aws-blog-emr-ranger;"
-                    ],
-                    "Jar": "command-runner.jar",
-                    "MainClass": ""
-                },
-                "JobFlowId": {
-                    "Ref": "EMRSampleCluster"
-                },
-                "Name": "DownloadScripts"
-            },
-            "Type": "AWS::EMR::Step"
-        },
         "CreateHiveTables": {
             "Properties": {
                 "ActionOnFailure": "CONTINUE",
@@ -236,13 +227,14 @@
                 "ActionOnFailure": "CONTINUE",
                 "HadoopJarStep": {
                     "Args": [
-                        "/tmp/aws-blog-emr-ranger/emr-steps/install-hive-hdfs-ranger-plugin-new.sh",
+                        "/tmp/aws-blog-emr-ranger/emr-steps/install-hive-hdfs-ranger-plugin.sh",
                         {
                             "Ref": "RangerHostname"
                         },
                         {
                             "Ref": "rangerVersion"
-                        }
+                        },
+                        "s3://test-emr-security"
                     ],
                     "Jar": "s3://elasticmapreduce/libs/script-runner/script-runner.jar",
                     "MainClass": ""

@@ -5,30 +5,17 @@ export JAVA_HOME=/usr/lib/jvm/jre
 # Define variables
 installpath=/usr/lib/ranger
 mysql_jar_location=http://central.maven.org/maven2/mysql/mysql-connector-java/5.1.39/mysql-connector-java-5.1.39.jar
+s3bucket=$6
 ranger_version=$5
 if [ "$ranger_version" == "0.6" ]; then
-   ranger_s3bucket=s3://security-poc/ranger/ranger-0.6.1
+   ranger_s3bucket=$s3bucket/ranger/ranger-0.6.1
    ranger_admin_server=ranger-0.6.1-admin
    ranger_user_sync=ranger-0.6.1-usersync
 else
-   ranger_s3bucket=hs3://security-poc/ranger/ranger-0.5
+   ranger_s3bucket=$s3bucket/ranger/ranger-0.5
    ranger_admin_server=ranger-0.5.3-admin
    ranger_user_sync=ranger-0.5.3-usersync
 fi
-#ranger_s3bucket=https://s3.amazonaws.com/security-poc/ranger/ranger-0.5
-#ranger_admin_server=ranger-0.5.3-admin
-#ranger_user_sync=ranger-0.5.3-usersync
-#ranger_s3bucket=https://s3.amazonaws.com/security-poc/ranger/ranger-0.6
-#ranger_admin_server=ranger-0.6.0-SNAPSHOT-admin
-#ranger_user_sync=ranger-0.6.0-SNAPSHOT-usersync
-#ldap_server_url=ldap://172.31.62.131
-#ldap_base_dn=dc=corp,dc=prod,dc=local
-#ldap_bind_user_dn=binduser@corp.prod.local
-#ldap_bind_password=Bind@User
-#ldap_server_url=ldap://172.31.58.212
-#ldap_base_dn=dc=corp1,dc=prod,dc=local
-#ldap_bind_user_dn=binduser@corp1.prod.local
-#ldap_bind_password=Bind@User123
 ldap_ip_address=$1
 ldap_server_url=ldap://$ldap_ip_address
 ldap_base_dn=$2
