@@ -106,8 +106,8 @@
             "Type": "String"
      },
     "s3artifactsRepoHttpUrl": {
-            "Default": "https://s3.amazonaws.com/test-emr-security/",
-            "AllowedValues" : ["https://s3.amazonaws.com/test-emr-security/"],
+            "Default": "https://s3.amazonaws.com/test-emr-security",
+            "AllowedValues" : ["https://s3.amazonaws.com/test-emr-security"],
             "Description": "Default location where the artifacts are placed.",
             "Type": "String"
      },

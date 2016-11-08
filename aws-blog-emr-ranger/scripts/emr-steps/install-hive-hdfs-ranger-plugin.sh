@@ -7,7 +7,7 @@ sudo -E bash -c 'echo $JAVA_HOME'
 installpath=/usr/lib/ranger
 ranger_fqdn=$1
 mysql_jar_location=http://central.maven.org/maven2/mysql/mysql-connector-java/5.1.39/mysql-connector-java-5.1.39.jar
-mysql_jar=mysql-connector-java-5.1.39-bin.jar
+mysql_jar=mysql-connector-java-5.1.39.jar
 ranger_version=$2
 s3bucket=$3
 if [ "$ranger_version" == "0.6" ]; then
