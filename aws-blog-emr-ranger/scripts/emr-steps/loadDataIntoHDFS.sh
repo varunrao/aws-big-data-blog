@@ -4,7 +4,7 @@ set -x
 # Define variables
 awsregion=$1
 installpath=/tmp
-hdfs_data_location=s3://$awsregion.elasticmapreduce.samples/freebase/data/
+hdfs_data_location=s3://$awsregion.elasticmapreduce.samples/freebase/data
 cd $installpath
 sudo aws s3 cp $hdfs_data_location/football_coach.tsv .
 sudo aws s3 cp $hdfs_data_location/football_coach_position.tsv .

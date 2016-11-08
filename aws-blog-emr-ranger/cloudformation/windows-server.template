@@ -25,7 +25,17 @@
     "myDirectoryIPAddresses": {
       "Description": "IP Address of the Simmple AD server",
       "Type": "String"
-    }
+    },
+    "createUsersPs1Path": {
+       "Default": "https://raw.githubusercontent.com/varunrao/aws-big-data-blog/master/aws-blog-emr-ranger/scripts/create-simple-ad-users.ps1",
+       "Description": "Git Repo URL for the create user powershell script.",
+       "Type": "String"
+     },
+     "ldfFilePath": {
+        "Default": "https://s3.amazonaws.com/test-emr-security/inputdata/load-users.ldf",
+        "Description": "Default location the ldf file is placed to load users.",
+        "Type": "String"
+     }
   },
   "Mappings": {
     "AWSRegion2AMI": {
@@ -109,8 +119,6 @@
                 {
                   "description": "Run the create users command.",
                   "runCommand": [
-                    "$url = 'https://s3.amazonaws.com/security-poc/cfn/create-simple-ad-users-new.ps1'",
-                    "iex ((new-object net.webclient).DownloadString($url))",
                     "iex -Command 'create-simple-ad-users-new.ps1'"
                   ]
                 }
@@ -229,8 +237,12 @@
                 "Stop-Transcript | out-null\n",
                 "Start-Transcript -path c:/log-out.txt -append\n",
                 "$client = new-object System.Net.WebClient\n",
-                "$client.DownloadFile('https://s3.amazonaws.com/security-poc/inputdata/load-users-new.ldf','C:\\load-users-new.ldf')\n",
-                "$client.DownloadFile('https://s3.amazonaws.com/security-poc/cfn/create-simple-ad-users-new.ps1','C:\\create-simple-ad-users-new.ps1')\n",
+                "$client.DownloadFile('",
+                { "Ref": "ldfFilePath" },
+                  "','C:\\load-users-new.ldf')\n",
+                "$client.DownloadFile('",
+                 { "Ref": "createUsersPs1Path" },
+                "','C:\\create-simple-ad-users-new.ps1')\n",
                 "Stop-Transcript\n",
                 "</powershell>\n"
               ]
