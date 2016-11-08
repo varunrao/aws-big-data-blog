@@ -84,7 +84,7 @@
                 ],
                 "BootstrapActions": [
                     {
-                        "Name": "Install SSM Plugin",
+                        "Name": "Download scripts",
                         "ScriptBootstrapAction": {
                             "Path": "s3://test-emr-security/scripts/download-scripts.sh",
                             "Args": ["https://github.com/varunrao/aws-big-data-blog/trunk/aws-blog-emr-ranger"]
