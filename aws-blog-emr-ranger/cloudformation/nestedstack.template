@@ -102,7 +102,7 @@
     "SimpleAD": {
       "Type": "AWS::CloudFormation::Stack",
       "Properties": {
-        "TemplateURL": "https://s3.amazonaws.com/security-poc/cfn/simple-ad-template.template",
+        "TemplateURL": "https://raw.githubusercontent.com/varunrao/aws-big-data-blog/master/aws-blog-emr-ranger/cloudformation/simple-ad-template.template",
         "Parameters": {
           "VPC": {
             "Ref": "VPC"
@@ -123,7 +123,7 @@
         "SimpleAD"
       ],
       "Properties": {
-        "TemplateURL": "https://s3.amazonaws.com/security-poc/cfn/windows-server.template",
+        "TemplateURL": "https://raw.githubusercontent.com/varunrao/aws-big-data-blog/master/aws-blog-emr-ranger/cloudformation//windows-server.template",
         "Parameters": {
           "VPC": {
             "Ref": "VPC"
@@ -159,7 +159,7 @@
         "WindowsInstance"
       ],
       "Properties": {
-        "TemplateURL": "https://s3.amazonaws.com/security-poc/cfn/ranger-server.template",
+        "TemplateURL": "https://raw.githubusercontent.com/varunrao/aws-big-data-blog/master/aws-blog-emr-ranger/cloudformation/ranger-server.template",
         "Parameters": {
           "VPC": {
             "Ref": "VPC"
@@ -199,7 +199,7 @@
         "RangerServer"
       ],
       "Properties": {
-        "TemplateURL": "https://s3.amazonaws.com/security-poc/cfn/emr-template.template",
+        "TemplateURL": "https://raw.githubusercontent.com/varunrao/aws-big-data-blog/master/aws-blog-emr-ranger/cloudformation/emr-template.template",
         "Parameters": {
           "emrReleaseLabel": {"Ref" : "emrReleaseLabel"},
           "rangerVersion": {"Ref" : "rangerVersion"},

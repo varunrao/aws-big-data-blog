@@ -101,16 +101,19 @@
     },
     "downloadScriptLocation": {
             "Default": "https://s3.amazonaws.com/test-emr-security/scripts/download-scripts.sh",
+            "AllowedValues" : ["https://s3.amazonaws.com/test-emr-security/scripts/download-scripts.sh"],
             "Description": "Default HTTPS location where the download scripts are placed..",
             "Type": "String"
      },
     "s3artifactsRepo": {
             "Default": "s3://test-emr-security",
+            "AllowedValues" : ["s3://test-emr-security"],
             "Description": "Default location where the artifacts are placed.",
             "Type": "String"
      },
      "gitRepo": {
             "Default": "https://github.com/varunrao/aws-big-data-blog/trunk/aws-blog-emr-ranger",
+            "AllowedValues" : ["https://github.com/varunrao/aws-big-data-blog/trunk/aws-blog-emr-ranger"],
             "Description": "Git Repo URL path.",
             "Type": "String"
         }

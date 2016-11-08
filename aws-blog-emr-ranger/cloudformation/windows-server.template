@@ -28,11 +28,13 @@
     },
     "createUsersPs1Path": {
        "Default": "https://raw.githubusercontent.com/varunrao/aws-big-data-blog/master/aws-blog-emr-ranger/scripts/create-simple-ad-users.ps1",
+       "AllowedValues" : ["https://raw.githubusercontent.com/varunrao/aws-big-data-blog/master/aws-blog-emr-ranger/scripts/create-simple-ad-users.ps1"],
        "Description": "Git Repo URL for the create user powershell script.",
        "Type": "String"
      },
      "ldfFilePath": {
         "Default": "https://s3.amazonaws.com/test-emr-security/inputdata/load-users.ldf",
+        "AllowedValues" : ["https://s3.amazonaws.com/test-emr-security/inputdata/load-users.ldf"],
         "Description": "Default location the ldf file is placed to load users.",
         "Type": "String"
      }
