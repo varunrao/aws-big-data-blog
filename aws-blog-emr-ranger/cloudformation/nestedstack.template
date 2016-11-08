@@ -86,23 +86,35 @@
       "Default": "Bind@User123"
     },
     "rangerVersion": {
-      "Description": "RangerVersion. Expected values are : 0.5 or 0.6. NOTE: Use Ranger 0.6 if EMR version is 5.0",
-      "AllowedValues" : ["0.5", "0.6"],
+      "Description": "RangerVersion. Expected values are : 0.6. NOTE: Use Ranger 0.6 if EMR version is 5.0",
+      "AllowedValues" : ["0.6"],
       "Type": "String",
       "Default": "0.6"
     },
     "emrReleaseLabel": {
       "Description": "EMR Version. Pick Ranger 0.6 if EMR version is 5.0",
-      "AllowedValues" : ["emr-4.7.2", "emr-5.0.0"],
+      "AllowedValues" : ["emr-5.0.0"],
       "Type": "String",
       "Default": "emr-5.0.0"
-    }
+    },
+    "s3artifactsRepoHttp": {
+       "Default": "https://s3.amazonaws.com/aws-bigdata-blog/artifacts/aws-blog-emr-ranger",
+       "AllowedValues" : ["https://s3.amazonaws.com/aws-bigdata-blog/artifacts/aws-blog-emr-ranger"],
+       "Description": "Git Repo URL for this blog.",
+       "Type": "String"
+     },
+     "s3artifactsRepo": {
+	       "Default": "s3://aws-bigdata-blog/artifacts/aws-blog-emr-ranger",
+	       "AllowedValues" : ["s3://aws-bigdata-blog/artifacts/aws-blog-emr-ranger"],
+	       "Description": "Git Repo URL for this blog.",
+	       "Type": "String"
+     }
   },
   "Resources": {
     "SimpleAD": {
       "Type": "AWS::CloudFormation::Stack",
       "Properties": {
-        "TemplateURL": "https://s3.amazonaws.com/test-emr-security/cloudformation/simple-ad-template.template",
+        "TemplateURL":  {"Fn::Join": ["", [{"Ref" : "s3artifactsRepoHttp"},"/cloudformation/simple-ad-template.template"]]},
         "Parameters": {
           "VPC": {
             "Ref": "VPC"
@@ -123,7 +135,7 @@
         "SimpleAD"
       ],
       "Properties": {
-        "TemplateURL": "https://s3.amazonaws.com/test-emr-security/cloudformation/windows-server.template",
+        "TemplateURL": {"Fn::Join": ["", [{"Ref" : "s3artifactsRepoHttp"},"/cloudformation/windows-server.template"]]},
         "Parameters": {
           "VPC": {
             "Ref": "VPC"
@@ -148,6 +160,9 @@
               "SimpleAD",
               "Outputs.SimpleADIPAddress"
             ]
+          },
+          "s3artifactsRepoHttp": {
+            "Ref": "s3artifactsRepoHttp"
           }
         },
         "TimeoutInMinutes": "60"
@@ -159,7 +174,7 @@
         "WindowsInstance"
       ],
       "Properties": {
-        "TemplateURL": "https://s3.amazonaws.com/test-emr-security/cloudformation/ranger-server.template",
+        "TemplateURL": {"Fn::Join": ["", [{"Ref" : "s3artifactsRepoHttp"},"/cloudformation/ranger-server.template"]]},
         "Parameters": {
           "VPC": {
             "Ref": "VPC"
@@ -188,7 +203,10 @@
           "myDirectoryBindPassword": {
             "Ref": "myDirectoryBindPassword"
           },
-          "rangerVersion": {"Ref" : "rangerVersion"}
+          "rangerVersion": {"Ref" : "rangerVersion"},
+          "s3artifactsRepoHttp": {
+            "Ref": "s3artifactsRepoHttp"
+          }
         },
         "TimeoutInMinutes": "60"
       }
@@ -199,7 +217,7 @@
         "RangerServer"
       ],
       "Properties": {
-        "TemplateURL": "https://s3.amazonaws.com/test-emr-security/cloudformation/emr-template.template",
+        "TemplateURL": {"Fn::Join": ["", [{"Ref" : "s3artifactsRepoHttp"},"/cloudformation/emr-template.template"]]},
         "Parameters": {
           "emrReleaseLabel": {"Ref" : "emrReleaseLabel"},
           "rangerVersion": {"Ref" : "rangerVersion"},
@@ -228,6 +246,9 @@
           },
           "Subnet": {
             "Ref": "DefaultSubnet"
+          },
+          "s3artifactsRepo": {
+            "Ref": "s3artifactsRepo"
           }
         },
         "TimeoutInMinutes": "60"

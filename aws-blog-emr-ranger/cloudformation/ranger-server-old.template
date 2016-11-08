@@ -99,12 +99,24 @@
       "Type": "String",
       "Default": "0.6"
     },
-    "s3artifactsRepoHttp": {
-       "Default": "https://s3.amazonaws.com/test-emr-security",
-       "AllowedValues" : ["https://s3.amazonaws.com/test-emr-security"],
-       "Description": "Git Repo URL for this blog.",
-       "Type": "String"
-     }
+    "downloadScriptLocation": {
+            "Default": "https://s3.amazonaws.com/test-emr-security/scripts/download-scripts.sh",
+            "AllowedValues" : ["https://s3.amazonaws.com/test-emr-security/scripts/download-scripts.sh"],
+            "Description": "Default HTTPS location where the download scripts are placed..",
+            "Type": "String"
+     },
+    "s3artifactsRepoHttpUrl": {
+            "Default": "https://s3.amazonaws.com/test-emr-security",
+            "AllowedValues" : ["https://s3.amazonaws.com/test-emr-security"],
+            "Description": "Default location where the artifacts are placed.",
+            "Type": "String"
+     },
+     "gitRepo": {
+            "Default": "https://github.com/varunrao/aws-big-data-blog/trunk/aws-blog-emr-ranger",
+            "AllowedValues" : ["https://github.com/varunrao/aws-big-data-blog/trunk/aws-blog-emr-ranger"],
+            "Description": "Git Repo URL path.",
+            "Type": "String"
+        }
   },
   "Mappings" : {
     "AWSInstanceType2Arch" : {
@@ -281,7 +293,7 @@
                   "Fn::Join": [
                     "",
                     [
-                      "bash /tmp/install-ranger-admin-server.sh ",
+                      "bash /tmp/aws-blog-emr-ranger/scripts/install-ranger-admin-server.sh ",
                       {
                         "Ref": "myDirectoryIPAddress"
                       },
@@ -303,7 +315,7 @@
                       },
                       " ",
                       {
-                        "Ref": "s3artifactsRepoHttp"
+                        "Ref": "s3artifactsRepoHttpUrl"
                       },
                       " > create-ranger-server-output.log \n"
                     ]
@@ -335,8 +347,11 @@
                 "#!/bin/bash\n",
                 "cd /tmp\n",
                 "wget ", 
-                	{"Ref": "s3artifactsRepoHttp"},
-                 "/scripts/install-ranger-admin-server.sh\n",
+                	{"Ref": "downloadScriptLocation"},
+                 "\n",
+                "bash download-scripts.sh ",
+                	{"Ref": "gitRepo"},
+                 "\n",
                  "yum update aws-cfn-bootstrap\n",
                  "# Install the files and packages from the metadata\n",
                  "/opt/aws/bin/cfn-init ",

@@ -19,6 +19,7 @@ PARTITIONED BY (
  hour STRING )
 STORED AS SEQUENCEFILE
 LOCATION '$hive_script_data_location/joined_impressions/';
+MSCK REPAIR TABLE tblanalyst1;
 CREATE EXTERNAL TABLE IF NOT EXISTS tblanalyst2 (
  request_begin_time STRING,
  ad_id STRING,
@@ -33,5 +34,6 @@ PARTITIONED BY (
  hour STRING )
 STORED AS SEQUENCEFILE
 LOCATION '$hive_script_data_location/joined_impressions/';
+MSCK REPAIR TABLE tblanalyst2;
 " >> createTable.hql
 hive -f createTable.hql

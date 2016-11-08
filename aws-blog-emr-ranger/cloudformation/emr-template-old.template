@@ -67,12 +67,24 @@
             "Description": "Version of the Ranger Server. Values are 0.5 and 0.6",
             "Type": "String"
         },
-       "s3artifactsRepo": {
-	       "Default": "s3://test-emr-security",
-	       "AllowedValues" : ["s3://test-emr-security"],
-	       "Description": "Git Repo URL for this blog.",
-	       "Type": "String"
-     	}
+        "downloadScriptLocation": {
+            "Default": "s3://test-emr-security/scripts/download-scripts.sh",
+            "AllowedValues" : ["s3://test-emr-security/scripts/download-scripts.sh"],
+            "Description": "Default S3 location where the download scripts are placed.",
+            "Type": "String"
+     	},
+        "s3artifactsRepo": {
+            "Default": "s3://test-emr-security",
+            "AllowedValues" : ["s3://test-emr-security"],
+            "Description": "Default location where the artifacts are placed.",
+            "Type": "String"
+        },
+        "gitRepo": {
+            "Default": "https://github.com/varunrao/aws-big-data-blog/trunk/aws-blog-emr-ranger",
+            "AllowedValues" : ["https://github.com/varunrao/aws-big-data-blog/trunk/aws-blog-emr-ranger"],
+            "Description": "Git Repo URL path.",
+            "Type": "String"
+        }
     },
     "Resources": {
         "EMRSampleCluster": {
@@ -88,7 +100,15 @@
                         "Name": "Hue"
                     }
                 ],
-                "BootstrapActions": [],
+                "BootstrapActions": [
+                    {
+                        "Name": "Download scripts",
+                        "ScriptBootstrapAction": {
+                            "Path": {"Ref" : "downloadScriptLocation"},
+                            "Args": [{ "Ref" : "gitRepo" }]
+                        }
+                    }
+                ],
                 "Configurations": [
                     {
                         "Classification": "hue-ini",
@@ -205,9 +225,7 @@
                 "ActionOnFailure": "CONTINUE",
                 "HadoopJarStep": {
                     "Args": [
-                        {
-                  			"Fn::Join": ["", [{ "Ref": "s3artifactsRepo"}, "/scripts/emr-steps/createHiveTables.sh"]]
-                     	},
+                        "/mnt/tmp/aws-blog-emr-ranger/scripts/emr-steps/createHiveTables.sh",
                         { 
                           "Ref" : "AWS::Region" 
                         }
@@ -227,9 +245,7 @@
                 "ActionOnFailure": "CONTINUE",
                 "HadoopJarStep": {
                     "Args": [
-                        {
-                  			"Fn::Join": ["", [{ "Ref": "s3artifactsRepo"}, "/scripts/emr-steps/install-hive-hdfs-ranger-plugin.sh"]]
-                     	},
+                        "/mnt/tmp/aws-blog-emr-ranger/scripts/emr-steps/install-hive-hdfs-ranger-plugin.sh",
                         {
                             "Ref": "RangerHostname"
                         },
@@ -255,9 +271,7 @@
                 "ActionOnFailure": "CONTINUE",
                 "HadoopJarStep": {
                     "Args": [
-                        {
-                  			"Fn::Join": ["", [{ "Ref": "s3artifactsRepo"}, "/scripts/emr-steps/install-hive-hdfs-ranger-policies.sh"]]
-                     	},
+                        "/mnt/tmp/aws-blog-emr-ranger/scripts/emr-steps/install-hive-hdfs-ranger-policies.sh",
                         {
                             "Ref": "RangerHostname"
                         },
@@ -280,9 +294,7 @@
                 "ActionOnFailure": "CONTINUE",
                 "HadoopJarStep": {
                     "Args": [
-                        {
-                  			"Fn::Join": ["", [{ "Ref": "s3artifactsRepo"}, "/scripts/emr-steps/loadDataIntoHDFS.sh"]]
-                     	},
+                        "/mnt/tmp/aws-blog-emr-ranger/scripts/emr-steps/loadDataIntoHDFS.sh",
                         { 
                           "Ref" : "AWS::Region" 
                         }
@@ -325,9 +337,7 @@
                 "ActionOnFailure": "CONTINUE",
                 "HadoopJarStep": {
                     "Args": [
-                        {
-                  			"Fn::Join": ["", [{ "Ref": "s3artifactsRepo"}, "/scripts/emr-steps/updateHueLdapUrl.sh"]]
-                     	},
+                        "/mnt/tmp/aws-blog-emr-ranger/scripts/emr-steps/updateHueLdapUrl.sh",
                         {
                             "Ref": "LDAPServerIP"
                         }

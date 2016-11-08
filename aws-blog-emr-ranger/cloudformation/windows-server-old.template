@@ -26,11 +26,17 @@
       "Description": "IP Address of the Simmple AD server",
       "Type": "String"
     },
-    "s3artifactsRepoHttp": {
-       "Default": "https://s3.amazonaws.com/test-emr-security",
-       "AllowedValues" : ["https://s3.amazonaws.com/test-emr-security"],
-       "Description": "Git Repo URL for this blog.",
+    "createUsersPs1Path": {
+       "Default": "https://raw.githubusercontent.com/varunrao/aws-big-data-blog/master/aws-blog-emr-ranger/scripts/create-simple-ad-users.ps1",
+       "AllowedValues" : ["https://raw.githubusercontent.com/varunrao/aws-big-data-blog/master/aws-blog-emr-ranger/scripts/create-simple-ad-users.ps1"],
+       "Description": "Git Repo URL for the create user powershell script.",
        "Type": "String"
+     },
+     "ldfFilePath": {
+        "Default": "https://s3.amazonaws.com/test-emr-security/inputdata/load-users.ldf",
+        "AllowedValues" : ["https://s3.amazonaws.com/test-emr-security/inputdata/load-users.ldf"],
+        "Description": "Default location the ldf file is placed to load users.",
+        "Type": "String"
      }
   },
   "Mappings": {
@@ -234,11 +240,11 @@
                 "Start-Transcript -path c:/log-out.txt -append\n",
                 "$client = new-object System.Net.WebClient\n",
                 "$client.DownloadFile('",
-                { "Ref": "s3artifactsRepoHttp" },
-                  "/inputdata/load-users-new.ldf','C:\\load-users-new.ldf')\n",
+                { "Ref": "ldfFilePath" },
+                  "','C:\\load-users-new.ldf')\n",
                 "$client.DownloadFile('",
-                 { "Ref": "s3artifactsRepoHttp" },
-                "/scripts/create-simple-ad-users.ps1','C:\\create-simple-ad-users.ps1')\n",
+                 { "Ref": "createUsersPs1Path" },
+                "','C:\\create-simple-ad-users.ps1')\n",
                 "Stop-Transcript\n",
                 "</powershell>\n"
               ]
