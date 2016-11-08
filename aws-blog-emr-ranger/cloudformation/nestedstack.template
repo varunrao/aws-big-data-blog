@@ -1,0 +1,255 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Parameters": {
+    "DomainName": {
+      "Default": "corp.emr.local",
+      "Description": "Default Domain Name For SimpleAD Server. Do Not Change, as it may break other scripts",
+      "AllowedValues" : ["corp.emr.local"],
+      "Type": "String"
+    },
+    "DomainPassword": {
+      "Default": "Password@123",
+      "Description": "Default Password for SimpleAD. Do Not Change, as it may break other scripts",
+      "AllowedValues" : ["Password@123"],
+      "Type": "String"
+    },
+    "DomainShortName": {
+      "Default": "EmrSimpleAD",
+      "Description": "Subnet ID2 for creating the SimpleAD",
+      "Type": "String"
+    },
+    "DefaultSubnet": {
+      "Description": "Subnet ID1 for creating the SimpleAD",
+      "Type": "AWS::EC2::Subnet::Id"
+    },
+    "Subnet1SimpleAD": {
+      "Description": "Subnet ID1 for creating the SimpleAD",
+      "Type": "AWS::EC2::Subnet::Id"
+    },
+    "Subnet2SimpleAD": {
+      "Description": "Subnet ID2 for creating the SimpleAD",
+      "Type": "AWS::EC2::Subnet::Id"
+    },
+    "VPC": {
+      "Description": "VPC ID for creating the EMR cluster",
+      "Type": "AWS::EC2::VPC::Id"
+    },
+    "KeyName": {
+      "Description": "Name of an existing EC2 KeyPair to enable SSH to the instances",
+      "Type": "AWS::EC2::KeyPair::KeyName"
+    },
+    "CoreInstanceCount": {
+      "Default": "3",
+      "Description": "Number of core instances",
+      "Type": "Number"
+    },
+    "RangerInstanceType": {
+      "Default": "m4.xlarge",
+      "Description": "Instance Type of the core node",
+      "Type": "String"
+    },
+    "CoreInstanceType": {
+      "Default": "m3.2xlarge",
+      "Description": "Instance Type of the core node",
+      "Type": "String"
+    },
+    "EMRClusterName": {
+      "Default": "SecurityPOCCluster",
+      "Description": "Cluster name for the EMR",
+      "Type": "String"
+    },
+    "EMRLogDir": {
+      "Description": "Log Dir for the EMR cluster",
+      "Type": "String"
+    },
+    "MasterInstanceType": {
+      "Default": "m3.2xlarge",
+      "Description": "Instance Type of the master node",
+      "Type": "String"
+    },
+    "myDirectoryBaseDN": {
+      "Description": "Base DN Simple AD server",
+      "Type": "String",
+      "AllowedValues" : ["dc=corp,dc=emr,dc=local"],
+      "Default": "dc=corp,dc=emr,dc=local"
+    },
+    "myDirectoryBindUser": {
+      "Description": "BindUser Simple AD server",
+      "Type": "String",
+      "AllowedValues" : ["binduser@corp.emr.local"],
+      "Default": "binduser@corp.emr.local"
+    },
+    "myDirectoryBindPassword": {
+      "Description": "BindPassword Simple AD server",
+      "Type": "String",
+      "AllowedValues" : ["Bind@User123"],
+      "Default": "Bind@User123"
+    },
+    "rangerVersion": {
+      "Description": "RangerVersion. Expected values are : 0.5 or 0.6. NOTE: Use Ranger 0.6 if EMR version is 5.0",
+      "AllowedValues" : ["0.5", "0.6"],
+      "Type": "String",
+      "Default": "0.6"
+    },
+    "emrReleaseLabel": {
+      "Description": "EMR Version. Pick Ranger 0.6 if EMR version is 5.0",
+      "AllowedValues" : ["emr-4.7.2", "emr-5.0.0"],
+      "Type": "String",
+      "Default": "emr-5.0.0"
+    }
+  },
+  "Resources": {
+    "SimpleAD": {
+      "Type": "AWS::CloudFormation::Stack",
+      "Properties": {
+        "TemplateURL": "https://s3.amazonaws.com/security-poc/cfn/simple-ad-template.template",
+        "Parameters": {
+          "VPC": {
+            "Ref": "VPC"
+          },
+          "Subnet1SimpleAD": {
+            "Ref": "Subnet1SimpleAD"
+          },
+          "Subnet2SimpleAD": {
+            "Ref": "Subnet2SimpleAD"
+          }
+        },
+        "TimeoutInMinutes": "60"
+      }
+    },
+    "WindowsInstance": {
+      "Type": "AWS::CloudFormation::Stack",
+      "DependsOn": [
+        "SimpleAD"
+      ],
+      "Properties": {
+        "TemplateURL": "https://s3.amazonaws.com/security-poc/cfn/windows-server.template",
+        "Parameters": {
+          "VPC": {
+            "Ref": "VPC"
+          },
+          "KeyName": {
+            "Ref": "KeyName"
+          },
+          "Subnet": {
+            "Ref": "DefaultSubnet"
+          },
+          "myDirectoryDomain": {
+            "Ref": "DomainName"
+          },
+          "myDirectoryId": {
+            "Fn::GetAtt": [
+              "SimpleAD",
+              "Outputs.SimpleADDomainID"
+            ]
+          },
+          "myDirectoryIPAddresses": {
+            "Fn::GetAtt": [
+              "SimpleAD",
+              "Outputs.SimpleADIPAddress"
+            ]
+          }
+        },
+        "TimeoutInMinutes": "60"
+      }
+    },
+    "RangerServer": {
+      "Type": "AWS::CloudFormation::Stack",
+      "DependsOn": [
+        "WindowsInstance"
+      ],
+      "Properties": {
+        "TemplateURL": "https://s3.amazonaws.com/security-poc/cfn/ranger-server.template",
+        "Parameters": {
+          "VPC": {
+            "Ref": "VPC"
+          },
+          "KeyName": {
+            "Ref": "KeyName"
+          },
+          "Subnet": {
+            "Ref": "DefaultSubnet"
+          },
+          "InstanceType": {
+            "Ref": "RangerInstanceType"
+          },
+          "myDirectoryIPAddress": {
+            "Fn::GetAtt": [
+              "SimpleAD",
+              "Outputs.SimpleADIPAddress"
+            ]
+          },
+          "myDirectoryBaseDN": {
+            "Ref": "myDirectoryBaseDN"
+          },
+          "myDirectoryBindUser": {
+            "Ref": "myDirectoryBindUser"
+          },
+          "myDirectoryBindPassword": {
+            "Ref": "myDirectoryBindPassword"
+          },
+          "rangerVersion": {"Ref" : "rangerVersion"}
+        },
+        "TimeoutInMinutes": "60"
+      }
+    },
+    "EMRCluster": {
+      "Type": "AWS::CloudFormation::Stack",
+      "DependsOn": [
+        "RangerServer"
+      ],
+      "Properties": {
+        "TemplateURL": "https://s3.amazonaws.com/security-poc/cfn/emr-template.template",
+        "Parameters": {
+          "emrReleaseLabel": {"Ref" : "emrReleaseLabel"},
+          "rangerVersion": {"Ref" : "rangerVersion"},
+          "LDAPServerIP": {
+            "Fn::GetAtt": [
+              "SimpleAD",
+              "Outputs.SimpleADIPAddress"
+            ]
+          },
+          "CoreInstanceCount": {"Ref" : "CoreInstanceCount"},
+          "CoreInstanceType": {"Ref" : "CoreInstanceType"},
+          "EMRClusterName": {"Ref" : "EMRClusterName"},
+          "EMRLogDir": {"Ref" : "EMRLogDir"},
+          "MasterInstanceType": {"Ref" : "MasterInstanceType"},
+          "RangerHostname": {
+            "Fn::GetAtt": [
+              "RangerServer",
+              "Outputs.IPAddress"
+            ]
+          },
+          "VPC": {
+            "Ref": "VPC"
+          },
+          "KeyName": {
+            "Ref": "KeyName"
+          },
+          "Subnet": {
+            "Ref": "DefaultSubnet"
+          }
+        },
+        "TimeoutInMinutes": "60"
+      }
+    }
+  },
+  "Outputs": {
+    "RangerServerIP": {
+      "Value": {
+        "Fn::GetAtt": [
+          "RangerServer",
+          "Outputs.IPAddress"
+        ]
+      }
+    },
+    "HueIPAddress": {
+      "Value": {
+        "Fn::GetAtt": [
+          "EMRCluster",
+          "Outputs.IPAddress"
+        ]
+      }
+    }
+  }
+}
