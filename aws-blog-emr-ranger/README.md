@@ -6,6 +6,4 @@ The code in this directory accompanies the AWS Big Data Blog on Implementing Aut
 This subtree contains the following code samples:
 
 - **cloudformation:** Clodformation scripts to setup the stack
-- **scripts:** Scripts used for the 
-
-## Deploying the sample via the AWS Console
+- **scripts:** Scripts used for Installing Ranger and other EMR bootstrap and step actions
