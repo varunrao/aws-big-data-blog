@@ -98,7 +98,17 @@
       "Description": "RangerVersion",
       "Type": "String",
       "Default": "0.6"
-    }
+    },
+    "downloadScriptLocation": {
+            "Default": "https://s3.amazonaws.com/test-emr-security/scripts/download-scripts.sh",
+            "Description": "Default HTTPS location where the download scripts are placed..",
+            "Type": "String"
+     },
+    "s3artifactsRepo": {
+            "Default": "s3://test-emr-security",
+            "Description": "Default location where the artifacts are placed.",
+            "Type": "String"
+     }
   },
   "Mappings" : {
     "AWSInstanceType2Arch" : {
@@ -275,7 +285,7 @@
                   "Fn::Join": [
                     "",
                     [
-                      "bash install-ranger-admin-server-new.sh ",
+                      "bash /tmp/install-ranger-admin-server-new.sh ",
                       {
                         "Ref": "myDirectoryIPAddress"
                       },
@@ -294,6 +304,9 @@
                       " ",
                       {
                         "Ref": "rangerVersion"
+                      },
+                      {
+                        "Ref": "s3artifactsRepo"
                       },
                       " > create-ranger-server-output.log \n"
                     ]
@@ -323,7 +336,11 @@
               "",
               [
                 "#!/bin/bash\n",
-                "wget https://s3.amazonaws.com/security-poc/ranger/install-ranger-admin-server-new.sh\n",
+                "cd /tmp\n",
+                "sudo yum -y install svn\n",
+                "svn export ", 
+                	{"Ref": "downloadScriptLocation"},
+                 "aws-blog-emr-ranger\n",
                 "yum update aws-cfn-bootstrap\n",
                  "# Install the files and packages from the metadata\n",
                  "/opt/aws/bin/cfn-init ",

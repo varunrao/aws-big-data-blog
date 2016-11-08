@@ -66,6 +66,21 @@
             "Default": "0.6",
             "Description": "Version of the Ranger Server. Values are 0.5 and 0.6",
             "Type": "String"
+        },
+        "downloadScriptLocation": {
+            "Default": "s3://test-emr-security/scripts/download-scripts.sh",
+            "Description": "Default S3 location where the download scripts are placed.",
+            "Type": "String"
+     	},
+        "s3artifactsRepo": {
+            "Default": "s3://test-emr-security",
+            "Description": "Default location where the artifacts are placed.",
+            "Type": "String"
+        },
+        "gitRepo": {
+            "Default": "https://github.com/varunrao/aws-big-data-blog/trunk/aws-blog-emr-ranger",
+            "Description": "Git Repo URL path.",
+            "Type": "String"
         }
     },
     "Resources": {
@@ -86,8 +101,8 @@
                     {
                         "Name": "Download scripts",
                         "ScriptBootstrapAction": {
-                            "Path": "s3://test-emr-security/scripts/download-scripts.sh",
-                            "Args": ["https://github.com/varunrao/aws-big-data-blog/trunk/aws-blog-emr-ranger"]
+                            "Path": {"Ref" : "downloadScriptLocation"},
+                            "Args": [{ "Ref" : "gitRepo" }]
                         }
                     }
                 ],
@@ -207,7 +222,7 @@
                 "ActionOnFailure": "CONTINUE",
                 "HadoopJarStep": {
                     "Args": [
-                        "/tmp/aws-blog-emr-ranger/emr-steps/createHiveTables.sh",
+                        "/mnt/tmp/aws-blog-emr-ranger/scripts/emr-steps/createHiveTables.sh",
                         { 
                           "Ref" : "AWS::Region" 
                         }
@@ -227,14 +242,16 @@
                 "ActionOnFailure": "CONTINUE",
                 "HadoopJarStep": {
                     "Args": [
-                        "/tmp/aws-blog-emr-ranger/emr-steps/install-hive-hdfs-ranger-plugin.sh",
+                        "/mnt/tmp/aws-blog-emr-ranger/scripts/emr-steps/install-hive-hdfs-ranger-plugin.sh",
                         {
                             "Ref": "RangerHostname"
                         },
                         {
                             "Ref": "rangerVersion"
                         },
-                        "s3://test-emr-security"
+                        {
+                            "Ref": "s3artifactsRepo"
+                        }
                     ],
                     "Jar": "s3://elasticmapreduce/libs/script-runner/script-runner.jar",
                     "MainClass": ""
@@ -251,7 +268,7 @@
                 "ActionOnFailure": "CONTINUE",
                 "HadoopJarStep": {
                     "Args": [
-                        "/tmp/aws-blog-emr-ranger/emr-steps/install-hive-hdfs-ranger-policies.sh",
+                        "/mnt/tmp/aws-blog-emr-ranger/scripts/emr-steps/install-hive-hdfs-ranger-policies.sh",
                         {
                             "Ref": "RangerHostname"
                         }
@@ -271,7 +288,7 @@
                 "ActionOnFailure": "CONTINUE",
                 "HadoopJarStep": {
                     "Args": [
-                        "/tmp/aws-blog-emr-ranger/emr-steps/loadDataIntoHDFS.sh",
+                        "/mnt/tmp/aws-blog-emr-ranger/scripts/emr-steps/loadDataIntoHDFS.sh",
                         { 
                           "Ref" : "AWS::Region" 
                         }
@@ -314,7 +331,7 @@
                 "ActionOnFailure": "CONTINUE",
                 "HadoopJarStep": {
                     "Args": [
-                        "/tmp/aws-blog-emr-ranger/emr-steps/updateHueLdapUrl.sh",
+                        "/mnt/tmp/aws-blog-emr-ranger/scripts/emr-steps/updateHueLdapUrl.sh",
                         {
                             "Ref": "LDAPServerIP"
                         }
