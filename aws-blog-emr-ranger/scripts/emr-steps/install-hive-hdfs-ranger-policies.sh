@@ -8,7 +8,7 @@ ranger_server_fqdn=$1
 default_domain=ec2.internal
 hdfs_namenode_fqdn=`hostname`.$default_domain
 hive_server2_fqdn=`hostname`.$default_domain
-ranger_policybucket=s3://security-poc/ranger/
+ranger_policybucket=$2
 #Update repo/policies
 sudo rm -rf $installpath
 sudo mkdir -p $installpath

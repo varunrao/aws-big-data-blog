@@ -293,7 +293,7 @@
                   "Fn::Join": [
                     "",
                     [
-                      "bash /tmp/install-ranger-admin-server-new.sh ",
+                      "bash /tmp/aws-blog-emr-ranger/scripts/install-ranger-admin-server.sh ",
                       {
                         "Ref": "myDirectoryIPAddress"
                       },
@@ -313,6 +313,7 @@
                       {
                         "Ref": "rangerVersion"
                       },
+                      " ",
                       {
                         "Ref": "s3artifactsRepo"
                       },

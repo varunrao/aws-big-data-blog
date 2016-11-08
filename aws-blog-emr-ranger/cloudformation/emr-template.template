@@ -274,7 +274,10 @@
                         "/mnt/tmp/aws-blog-emr-ranger/scripts/emr-steps/install-hive-hdfs-ranger-policies.sh",
                         {
                             "Ref": "RangerHostname"
-                        }
+                        },
+                        {
+                  			"Fn::Join": [{ "Ref": "s3artifactsRepo"}, "/inputdata"]
+                     	}
                     ],
                     "Jar": "s3://elasticmapreduce/libs/script-runner/script-runner.jar",
                     "MainClass": ""
