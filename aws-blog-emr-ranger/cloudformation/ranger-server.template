@@ -105,9 +105,9 @@
             "Description": "Default HTTPS location where the download scripts are placed..",
             "Type": "String"
      },
-    "s3artifactsRepo": {
-            "Default": "s3://test-emr-security",
-            "AllowedValues" : ["s3://test-emr-security"],
+    "s3artifactsRepoHttpUrl": {
+            "Default": "https://s3.amazonaws.com/test-emr-security/",
+            "AllowedValues" : ["https://s3.amazonaws.com/test-emr-security/"],
             "Description": "Default location where the artifacts are placed.",
             "Type": "String"
      },
@@ -315,7 +315,7 @@
                       },
                       " ",
                       {
-                        "Ref": "s3artifactsRepo"
+                        "Ref": "s3artifactsRepoHttpUrl"
                       },
                       " > create-ranger-server-output.log \n"
                     ]

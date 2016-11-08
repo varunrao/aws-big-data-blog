@@ -6,13 +6,13 @@ export JAVA_HOME=/usr/lib/jvm/jre
 installpath=/usr/lib/ranger
 mysql_jar_location=http://central.maven.org/maven2/mysql/mysql-connector-java/5.1.39/mysql-connector-java-5.1.39.jar
 ranger_version=$5
-s3bucket=$6
+s3bucket_http_url=$6
 if [ "$ranger_version" == "0.6" ]; then
-   ranger_s3bucket=$s3bucket/ranger/ranger-0.6.1
+   ranger_s3bucket=$s3bucket_http_url/ranger/ranger-0.6.1
    ranger_admin_server=ranger-0.6.1-admin
    ranger_user_sync=ranger-0.6.1-usersync
 else
-   ranger_s3bucket=$s3bucket/ranger/ranger-0.5
+   ranger_s3bucket=$s3bucket_http_url/ranger/ranger-0.5
    ranger_admin_server=ranger-0.5.3-admin
    ranger_user_sync=ranger-0.5.3-usersync
 fi
@@ -29,10 +29,10 @@ mysqladmin -u root password rangeradmin || true
 rm -rf $installpath
 mkdir -p $installpath/hadoop
 cd $installpath
-aws s3 cp $ranger_s3bucket/$ranger_admin_server.tar.gz .
-aws s3 cp $ranger_s3bucket/$ranger_user_sync.tar.gz .
+wget $ranger_s3bucket/$ranger_admin_server.tar.gz
+wget $ranger_s3bucket/$ranger_user_sync.tar.gz
 wget $mysql_jar_location
-aws s3 cp $ranger_s3bucket/solr_for_audit_setup.tar.gz .
+wget $ranger_s3bucket/solr_for_audit_setup.tar.gz .
 #Update ranger admin install.properties
 tar -xvf $ranger_admin_server.tar.gz
 cd $ranger_admin_server
