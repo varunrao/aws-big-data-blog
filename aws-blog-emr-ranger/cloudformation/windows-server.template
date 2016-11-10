@@ -28,7 +28,6 @@
     },
     "s3artifactsRepoHttp": {
        "Default": "https://s3.amazonaws.com/test-emr-security",
-       "AllowedValues" : ["https://s3.amazonaws.com/test-emr-security"],
        "Description": "Git Repo URL for this blog.",
        "Type": "String"
      }
