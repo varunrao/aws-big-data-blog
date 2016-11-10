@@ -92,8 +92,7 @@
       "Default": "0.6"
     },
     "emrReleaseLabel": {
-      "Description": "EMR Version. Pick Ranger 0.6 if EMR version is 5.0",
-      "AllowedValues" : ["emr-5.0.0"],
+      "Description": "EMR Version. Pick Ranger 0.6 if EMR version is 5.0 or higher",
       "Type": "String",
       "Default": "emr-5.0.0"
     },
