@@ -99,13 +99,11 @@
     },
     "s3artifactsRepoHttp": {
        "Default": "https://s3.amazonaws.com/aws-bigdata-blog/artifacts/aws-blog-emr-ranger",
-       "AllowedValues" : ["https://s3.amazonaws.com/aws-bigdata-blog/artifacts/aws-blog-emr-ranger"],
        "Description": "Git Repo URL for this blog.",
        "Type": "String"
      },
      "s3artifactsRepo": {
 	       "Default": "s3://aws-bigdata-blog/artifacts/aws-blog-emr-ranger",
-	       "AllowedValues" : ["s3://aws-bigdata-blog/artifacts/aws-blog-emr-ranger"],
 	       "Description": "Git Repo URL for this blog.",
 	       "Type": "String"
      }
