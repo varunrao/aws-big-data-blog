@@ -1,5 +1,5 @@
 {
-  "Description": "Sample CloudFormation template for creating an EMR cluster",
+  "Description": "CloudFormation template for creating a Windows Instance",
   "Parameters": {
     "VPC": {
       "Description": "VPC ID for creating the EMR cluster",

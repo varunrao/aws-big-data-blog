@@ -1,5 +1,5 @@
 {
-    "Description": "Sample CloudFormation template for creating an EMR cluster",
+    "Description": "CloudFormation template for creating an EMR cluster",
     "Outputs": {
         "IPAddress": {
             "Description": "IP address of EMR cluster MasterNode",
@@ -87,7 +87,16 @@
                         "Name": "Hue"
                     }
                 ],
-                "BootstrapActions": [],
+                "BootstrapActions": [
+                    {
+                        "Name": "Download scripts",
+                        "ScriptBootstrapAction": {
+                            "Path": {
+                  			"Fn::Join": ["", [{"Ref" : "s3artifactsRepo"}, "/scripts/download-scripts.sh"]]},
+                            "Args": [{ "Ref" : "s3artifactsRepo" }]
+                        }
+                    }
+                ],
                 "Configurations": [
                     {
                         "Classification": "hue-ini",
@@ -204,9 +213,7 @@
                 "ActionOnFailure": "CONTINUE",
                 "HadoopJarStep": {
                     "Args": [
-                        {
-                  			"Fn::Join": ["", [{ "Ref": "s3artifactsRepo"}, "/scripts/emr-steps/createHiveTables.sh"]]
-                     	},
+                        "/mnt/tmp/aws-blog-emr-ranger/scripts/emr-steps/createHiveTables.sh",
                         { 
                           "Ref" : "AWS::Region" 
                         }
@@ -226,9 +233,7 @@
                 "ActionOnFailure": "CONTINUE",
                 "HadoopJarStep": {
                     "Args": [
-                        {
-                  			"Fn::Join": ["", [{ "Ref": "s3artifactsRepo"}, "/scripts/emr-steps/install-hive-hdfs-ranger-plugin.sh"]]
-                     	},
+                        "/mnt/tmp/aws-blog-emr-ranger/scripts/emr-steps/install-hive-hdfs-ranger-plugin.sh",
                         {
                             "Ref": "RangerHostname"
                         },
@@ -254,9 +259,7 @@
                 "ActionOnFailure": "CONTINUE",
                 "HadoopJarStep": {
                     "Args": [
-                        {
-                  			"Fn::Join": ["", [{ "Ref": "s3artifactsRepo"}, "/scripts/emr-steps/install-hive-hdfs-ranger-policies.sh"]]
-                     	},
+                        "/mnt/tmp/aws-blog-emr-ranger/scripts/emr-steps/install-hive-hdfs-ranger-policies.sh",
                         {
                             "Ref": "RangerHostname"
                         },
@@ -279,9 +282,7 @@
                 "ActionOnFailure": "CONTINUE",
                 "HadoopJarStep": {
                     "Args": [
-                        {
-                  			"Fn::Join": ["", [{ "Ref": "s3artifactsRepo"}, "/scripts/emr-steps/loadDataIntoHDFS.sh"]]
-                     	},
+                        "/mnt/tmp/aws-blog-emr-ranger/scripts/emr-steps/loadDataIntoHDFS.sh",
                         { 
                           "Ref" : "AWS::Region" 
                         }
@@ -324,9 +325,7 @@
                 "ActionOnFailure": "CONTINUE",
                 "HadoopJarStep": {
                     "Args": [
-                        {
-                  			"Fn::Join": ["", [{ "Ref": "s3artifactsRepo"}, "/scripts/emr-steps/updateHueLdapUrl.sh"]]
-                     	},
+                        "/mnt/tmp/aws-blog-emr-ranger/scripts/emr-steps/updateHueLdapUrl.sh",
                         {
                             "Ref": "LDAPServerIP"
                         }

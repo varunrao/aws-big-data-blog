@@ -1,5 +1,5 @@
 {
-    "Description": "Sample CloudFormation template for creating an EMR cluster",
+    "Description": "CloudFormation template for creating Simple AD Server",
     "Outputs": {
         "SimpleADDomainID": {
             "Description": "ID of the newly Created SimpleAD",

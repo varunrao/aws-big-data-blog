@@ -98,12 +98,12 @@
     },
     "s3artifactsRepoHttp": {
        "Default": "https://s3.amazonaws.com/aws-bigdata-blog/artifacts/aws-blog-emr-ranger",
-       "Description": "Git Repo URL for this blog.",
+       "Description": "HTTP location of the repo.",
        "Type": "String"
      },
      "s3artifactsRepo": {
 	       "Default": "s3://aws-bigdata-blog/artifacts/aws-blog-emr-ranger",
-	       "Description": "Git Repo URL for this blog.",
+	       "Description": "S3 location of the repo.",
 	       "Type": "String"
      }
   },

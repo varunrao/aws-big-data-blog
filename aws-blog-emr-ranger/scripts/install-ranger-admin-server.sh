@@ -43,7 +43,7 @@ sudo sed -i "s|db_password=.*|db_password=rangeradmin|g" install.properties
 sudo sed -i "s|audit_db_password=.*|audit_db_password=rangerlogger|g" install.properties
 sudo sed -i "s|audit_store=.*|audit_store=solr|g" install.properties
 sudo sed -i "s|audit_solr_urls=.*|audit_solr_urls=http://localhost:8983/solr/ranger_audits|g" install.properties
-sudo sed -i "s|policymgr_external_url=.*|policymgr_external_url=http://`hostname`.ec2.internal:6080|g" install.properties
+sudo sed -i "s|policymgr_external_url=.*|policymgr_external_url=http://`hostname -I`:6080|g" install.properties
 #Update LDAP properties
 sudo sed -i "s|authentication_method=.*|authentication_method=LDAP|g" install.properties
 sudo sed -i "s|xa_ldap_url=.*|xa_ldap_url=$ldap_server_url|g" install.properties
@@ -62,7 +62,7 @@ chmod +x setup.sh
 cd $installpath
 tar -xvf $ranger_user_sync.tar.gz
 cd $ranger_user_sync
-sudo sed -i "s|POLICY_MGR_URL =.*|POLICY_MGR_URL=http://`hostname`.ec2.internal:6080|g" install.properties
+sudo sed -i "s|POLICY_MGR_URL =.*|POLICY_MGR_URL=http://`hostname -I`:6080|g" install.properties
 sudo sed -i "s|SYNC_SOURCE =.*|SYNC_SOURCE=ldap|g" install.properties
 sudo sed -i "s|SYNC_LDAP_URL =.*|SYNC_LDAP_URL=$ldap_server_url|g" install.properties
 sudo sed -i "s|SYNC_LDAP_BIND_DN =.*|SYNC_LDAP_BIND_DN=$ldap_bind_user_dn|g" install.properties
@@ -78,7 +78,7 @@ chmod +x setup.sh
 cd $installpath
 tar -xvf solr_for_audit_setup.tar.gz
 cd solr_for_audit_setup
-sudo sed -i "s|SOLR_HOST_URL=.*|SOLR_HOST_URL=http://`hostname`.ec2.internal:8983|g" install.properties
+sudo sed -i "s|SOLR_HOST_URL=.*|SOLR_HOST_URL=http://`hostname -I`:8983|g" install.properties
 sudo sed -i "s|SOLR_RANGER_PORT=.*|SOLR_RANGER_PORT=8983|g" install.properties
 chmod +x setup.sh
 ./setup.sh
@@ -86,7 +86,7 @@ chmod +x setup.sh
 sudo /usr/bin/ranger-admin stop || true
 sudo /usr/bin/ranger-admin start
 i=0;
-while ! timeout 1 bash -c "echo > /dev/tcp/`hostname`.ec2.internal/6080"; do
+while ! timeout 1 bash -c "echo > /dev/tcp/`hostname -I`/6080"; do
         sleep 10;
         i=$((i + 1))
         if (( i > 6 )); then
