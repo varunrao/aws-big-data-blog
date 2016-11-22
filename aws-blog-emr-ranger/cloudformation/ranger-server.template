@@ -76,31 +76,35 @@
       "ConstraintDescription": "must be a valid EC2 instance type."
     },
     "myDirectoryIPAddress": {
-      "Description": "IP Address of the Simple AD server",
+      "Description": "IP Address of the SimpleAD server",
       "Type": "String"
     },
     "myDirectoryBaseDN": {
-      "Description": "Base DN Simple AD server",
+      "Description": "Base DN SimpleAD server",
       "Type": "String",
-      "Default": "dc=corp,dc=emr,dc=local"
+      "Default": "dc=corp,dc=emr,dc=local",
+      "AllowedValues" : ["dc=corp,dc=emr,dc=local"]
     },
     "myDirectoryBindUser": {
-      "Description": "BindUser Simple AD server",
+      "Description": "BindUser SimpleAD server",
       "Type": "String",
-      "Default": "binduser@corp.emr.local"
+      "Default": "binduser@corp.emr.local",
+      "AllowedValues" : ["binduser@corp.emr.local"]
     },
     "myDirectoryBindPassword": {
-      "Description": "BindPassword Simple AD server",
+      "Description": "BindPassword SimpleAD server",
       "Type": "String",
-      "Default": "Bind@User123"
+      "Default": "Bind@User123",
+      "AllowedValues" : ["Bind@User123"]
     },
     "rangerVersion": {
       "Description": "RangerVersion",
       "Type": "String",
-      "Default": "0.6"
+      "Default": "0.6",
+      "AllowedValues" : ["0.6"]
     },
     "s3artifactsRepoHttp": {
-       "Default": "https://s3.amazonaws.com/test-emr-security",
+       "Default": "https://s3.amazonaws.com/aws-bigdata-blog/artifacts/aws-blog-emr-ranger",
        "Description": "Git Repo URL for this blog.",
        "Type": "String"
      }

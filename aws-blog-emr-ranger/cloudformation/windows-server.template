@@ -16,18 +16,19 @@
     "myDirectoryDomain": {
       "Description": "Domain for the directory",
       "Type": "String",
-      "Default" : "corp.emr.local"
+      "Default" : "corp.emr.local",
+      "AllowedValues" : ["corp.emr.local"]
     },
     "myDirectoryId": {
       "Description": "ID of SimpleAD",
       "Type": "String"
     },
     "myDirectoryIPAddresses": {
-      "Description": "IP Address of the Simmple AD server",
+      "Description": "IP Address of the SimpleAD server",
       "Type": "String"
     },
     "s3artifactsRepoHttp": {
-       "Default": "https://s3.amazonaws.com/test-emr-security",
+       "Default": "https://s3.amazonaws.com/aws-bigdata-blog/artifacts/aws-blog-emr-ranger",
        "Description": "Git Repo URL for this blog.",
        "Type": "String"
      }

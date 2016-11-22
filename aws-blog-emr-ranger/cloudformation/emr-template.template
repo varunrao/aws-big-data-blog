@@ -28,7 +28,6 @@
             "Type": "String"
         },
         "EMRLogDir": {
-            "Default": "s3://security-poc/logs",
             "Description": "Log Dir for the EMR cluster",
             "Type": "String"
         },
@@ -46,7 +45,7 @@
             "Type": "String"
         },
         "RangerHostname": {
-            "Description": "Internal FQDN of the Ranger Server",
+            "Description": "Internal IP address of the Ranger Server",
             "Type": "String"
         },
         "Subnet": {
@@ -64,11 +63,12 @@
         },
         "rangerVersion": {
             "Default": "0.6",
-            "Description": "Version of the Ranger Server. Values are 0.5 and 0.6",
-            "Type": "String"
+            "Description": "Version of the Ranger Server.",
+            "Type": "String",
+            "AllowedValues" : ["0.6"]
         },
        "s3artifactsRepo": {
-	       "Default": "s3://test-emr-security",
+	       "Default": "s3://aws-bigdata-blog/artifacts/aws-blog-emr-ranger",
 	       "Description": "Git Repo URL for this blog.",
 	       "Type": "String"
      	}

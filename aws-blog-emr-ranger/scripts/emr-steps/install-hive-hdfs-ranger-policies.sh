@@ -6,8 +6,9 @@ sudo -E bash -c 'echo $JAVA_HOME'
 installpath=/usr/lib/ranger-pugins
 ranger_server_fqdn=$1
 default_domain=ec2.internal
-hdfs_namenode_fqdn=`hostname -I`
-hive_server2_fqdn=`hostname -I`
+hostname=`hostname -I | xargs`
+hdfs_namenode_fqdn=$hostname
+hive_server2_fqdn=$hostname
 ranger_policybucket=$2
 #Update repo/policies
 sudo rm -rf $installpath
