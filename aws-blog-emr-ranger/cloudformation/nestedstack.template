@@ -19,7 +19,11 @@
       "Type": "String"
     },
     "DefaultSubnet": {
-      "Description": "Subnet ID1 for creating the SimpleAD",
+      "Description": "Subnet for EMR cluster and Ranger Server",
+      "Type": "AWS::EC2::Subnet::Id"
+    },
+    "SubnetWindowsEC2Instance": {
+      "Description": "Subnet to launch Windows EC2 instance. Specify Public Subnet if you plan to use this as a Bastion Host",
       "Type": "AWS::EC2::Subnet::Id"
     },
     "Subnet1SimpleAD": {
@@ -31,7 +35,7 @@
       "Type": "AWS::EC2::Subnet::Id"
     },
     "VPC": {
-      "Description": "VPC ID for creating the EMR cluster",
+      "Description": "VPC ID",
       "Type": "AWS::EC2::VPC::Id"
     },
     "KeyName": {
@@ -141,7 +145,7 @@
             "Ref": "KeyName"
           },
           "Subnet": {
-            "Ref": "DefaultSubnet"
+            "Ref": "SubnetWindowsEC2Instance"
           },
           "myDirectoryDomain": {
             "Ref": "DomainName"

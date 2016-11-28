@@ -10,7 +10,7 @@
       "Type": "AWS::EC2::KeyPair::KeyName"
     },
     "Subnet": {
-      "Description": "Subnet ID for creating the Windows server",
+      "Description": "Subnet ID for creating the Windows server. Specify Public Subnet if you plan to use this as a Bastion Host",
       "Type": "AWS::EC2::Subnet::Id"
     },
     "myDirectoryDomain": {
@@ -163,12 +163,12 @@
     "myEC2": {
       "Type": "AWS::EC2::Instance",
       "Properties": {
-        "SubnetId" : {"Ref": "Subnet"},
-        "SecurityGroupIds": [
-          {
-            "Ref": "sgADController"
-          }
-        ],
+        "NetworkInterfaces": [ {
+	      "AssociatePublicIpAddress": "true",
+	      "DeviceIndex": "0",
+	      "GroupSet": [{ "Ref" : "sgADController" }],
+	      "SubnetId": { "Ref" : "Subnet" }
+    	} ],
         "ImageId": {
           "Fn::FindInMap": [
             "AWSRegion2AMI",
