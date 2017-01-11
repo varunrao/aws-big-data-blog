@@ -63,7 +63,7 @@
       "Type": "String"
     },
     "EMRLogDir": {
-      "Description": "Log Dir for the EMR cluster",
+      "Description": "Log Dir for the EMR cluster. Eg: s3://xxx",
       "Type": "String"
     },
     "MasterInstanceType": {
