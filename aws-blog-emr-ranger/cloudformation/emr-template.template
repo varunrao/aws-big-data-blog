@@ -98,6 +98,20 @@
                     }
                 ],
                 "Configurations": [
+		           {
+					    "Classification": "core-site",
+					    "ConfigurationProperties": {
+					      "hadoop.security.group.mapping": "org.apache.hadoop.security.LdapGroupsMapping",
+					      "hadoop.security.group.mapping.ldap.bind.user": "binduser@corp.emr.local",
+					      "hadoop.security.group.mapping.ldap.bind.password": "Bind@User123",
+					      "hadoop.security.group.mapping.ldap.url": "ldap://172.31.21.225:389",
+					      "hadoop.security.group.mapping.ldap.base": "dc=corp,dc=emr,dc=local",
+					      "hadoop.security.group.mapping.ldap.search.filter.user": "(objectclass=*)",
+					      "hadoop.security.group.mapping.ldap.search.filter.group": "(objectclass=*)",
+					      "hadoop.security.group.mapping.ldap.search.attr.member": "member",
+					      "hadoop.security.group.mapping.ldap.search.attr.group.name": "cn"
+					    }
+				  	},
                     {
                         "Classification": "hue-ini",
                         "Configurations": [
