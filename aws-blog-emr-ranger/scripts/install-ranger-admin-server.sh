@@ -24,6 +24,14 @@ ldap_base_dn=$2
 ldap_bind_user_dn=$3
 ldap_bind_password=$4
 # Setup
+yum install -y openldap openldap-clients openldap-servers
+# Setup LDAP users
+wget $s3bucket_http_url/inputdata/load-users-new.ldf
+wget $s3bucket_http_url/inputdata/modify-users-new.ldf
+wget $s3bucket_http_url/scripts/create-users-using-ldap.sh
+chmod +x create-users-using-ldap.sh
+./create-users-using-ldap.sh $ldap_ip_address
+#Install mySQL
 yum -y install mysql-server
 service mysqld start
 chkconfig mysqld on

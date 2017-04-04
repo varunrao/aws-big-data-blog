@@ -12,6 +12,18 @@
         }
     },
     "Parameters": {
+        "myDirectoryBindUser": {
+          "Description": "BindUser Simple AD server",
+          "Type": "String",
+          "AllowedValues" : ["binduser@corp.emr.local"],
+          "Default": "binduser@corp.emr.local"
+        },
+        "myDirectoryBindPassword": {
+          "Description": "BindPassword Simple AD server",
+          "Type": "String",
+          "AllowedValues" : ["Bind@User123"],
+          "Default": "Bind@User123"
+        },
         "CoreInstanceCount": {
             "Default": "3",
             "Description": "Number of core instances",
@@ -98,20 +110,6 @@
                     }
                 ],
                 "Configurations": [
-		           {
-					    "Classification": "core-site",
-					    "ConfigurationProperties": {
-					      "hadoop.security.group.mapping": "org.apache.hadoop.security.JniBasedUnixGroupsMappingWithFallback",
-					      "hadoop.security.group.mapping.ldap.bind.user": "binduser@corp.emr.local",
-					      "hadoop.security.group.mapping.ldap.bind.password": "Bind@User123",
-					      "hadoop.security.group.mapping.ldap.url": "ldap://172.31.21.225:389",
-					      "hadoop.security.group.mapping.ldap.base": "dc=corp,dc=emr,dc=local",
-					      "hadoop.security.group.mapping.ldap.search.filter.user": "(objectclass=*)",
-					      "hadoop.security.group.mapping.ldap.search.filter.group": "(objectclass=*)",
-					      "hadoop.security.group.mapping.ldap.search.attr.member": "member",
-					      "hadoop.security.group.mapping.ldap.search.attr.group.name": "cn"
-					    }
-				  	},
                     {
                         "Classification": "hue-ini",
                         "Configurations": [
@@ -128,13 +126,20 @@
                                         "Classification": "ldap",
                                         "ConfigurationProperties": {
                                             "base_dn": "dc=corp,dc=emr,dc=local",
-                                            "bind_dn": "binduser",
-                                            "bind_password": "Bind@User123",
+                                            "bind_dn": { "Ref" : "myDirectoryBindUser" },
+                                            "bind_password": { "Ref" : "myDirectoryBindPassword" },
                                             "create_users_on_login": "true",
                                             "debug": "true",
                                             "force_username_lowercase": "true",
                                             "ignore_username_case": "true",
-                                            "ldap_url": "ldap://10.0.2.153",
+                                            "ldap_url": { "Fn::Join": [
+                                                            "",
+                                                            [
+                                                                "ldap://",
+                                                                { "Ref" : "LDAPServerIP" }
+                                                            ]
+                                                        ]
+                                                        },
                                             "ldap_username_pattern": "uid=<username>,cn=users,dc=corp,dc=emr,dc=local",
                                             "nt_domain": "corp.emr.local",
                                             "search_bind_authentication": "false",
@@ -160,6 +165,27 @@
                                 ]
                             }
                         ]
+                    },
+                    {
+                        "Classification": "core-site",
+                        "ConfigurationProperties": {
+                                "hadoop.security.group.mapping": "org.apache.hadoop.security.LdapGroupsMapping",
+                              "hadoop.security.group.mapping.ldap.bind.user": { "Ref" : "myDirectoryBindUser" },
+                              "hadoop.security.group.mapping.ldap.bind.password": { "Ref" : "myDirectoryBindPassword" },
+                              "hadoop.security.group.mapping.ldap.url": { "Fn::Join": [
+                                                            "",
+                                                            [
+                                                                "ldap://",
+                                                                { "Ref" : "LDAPServerIP" }
+                                                            ]
+                                                        ]
+                                                        },
+                              "hadoop.security.group.mapping.ldap.base": "dc=corp,dc=emr,dc=local",
+                              "hadoop.security.group.mapping.ldap.search.filter.user": "(objectclass=*)",
+                              "hadoop.security.group.mapping.ldap.search.filter.group": "(objectclass=*)",
+                              "hadoop.security.group.mapping.ldap.search.attr.member": "member",
+                              "hadoop.security.group.mapping.ldap.search.attr.group.name": "cn"
+                        }
                     }
                 ],
                 "Instances": {

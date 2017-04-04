@@ -220,6 +220,8 @@
       "Properties": {
         "TemplateURL": {"Fn::Join": ["", [{"Ref" : "s3artifactsRepoHttp"},"/cloudformation/emr-template.template"]]},
         "Parameters": {
+          "myDirectoryBindUser": {"Ref" : "myDirectoryBindUser"},
+          "myDirectoryBindPassword": {"Ref" : "myDirectoryBindPassword"},
           "emrReleaseLabel": {"Ref" : "emrReleaseLabel"},
           "rangerVersion": {"Ref" : "rangerVersion"},
           "LDAPServerIP": {
