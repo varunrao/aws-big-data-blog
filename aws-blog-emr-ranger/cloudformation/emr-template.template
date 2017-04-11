@@ -97,9 +97,6 @@
                     },
                     {
                         "Name": "Hue"
-                    },
-                    {
-                        "Name": "Zeppelin"
                     }
                 ],
                 "BootstrapActions": [
