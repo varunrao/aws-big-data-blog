@@ -91,22 +91,23 @@
     },
     "rangerVersion": {
       "Description": "RangerVersion. Expected values are : 0.6. NOTE: Use Ranger 0.6 if EMR version is 5.0",
-      "AllowedValues" : ["0.6"],
+      "AllowedValues" : ["0.6","0.7"],
       "Type": "String",
       "Default": "0.6"
     },
     "emrReleaseLabel": {
       "Description": "EMR Version. Pick Ranger 0.6 if EMR version is 5.0 or higher",
+      "AllowedValues" : ["emr-5.0.0","emr-5.4.0"],
       "Type": "String",
-      "Default": "emr-5.0.0"
+      "Default": "emr-5.4.0"
     },
     "s3artifactsRepoHttp": {
-       "Default": "https://s3.amazonaws.com/aws-bigdata-blog/artifacts/aws-blog-emr-ranger",
+       "Default": "https://s3.amazonaws.com/test-emr-security",
        "Description": "HTTP location of the repo.",
        "Type": "String"
      },
      "s3artifactsRepo": {
-	       "Default": "s3://aws-bigdata-blog/artifacts/aws-blog-emr-ranger",
+	       "Default": "s3://test-emr-security",
 	       "Description": "S3 location of the repo.",
 	       "Type": "String"
      }
@@ -221,7 +222,7 @@
         "TemplateURL": {"Fn::Join": ["", [{"Ref" : "s3artifactsRepoHttp"},"/cloudformation/emr-template.template"]]},
         "Parameters": {
           "myDirectoryBindUser": {"Ref" : "myDirectoryBindUser"},
-          "myDirectoryBindPassword": {"Ref" : "myDirectoryBindPassword"},
+          "emrReleaseLabel": {"Ref" : "emrReleaseLabel"},
           "emrReleaseLabel": {"Ref" : "emrReleaseLabel"},
           "rangerVersion": {"Ref" : "rangerVersion"},
           "LDAPServerIP": {

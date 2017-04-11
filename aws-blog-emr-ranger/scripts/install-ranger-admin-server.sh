@@ -9,7 +9,11 @@ mysql_jar_location=http://central.maven.org/maven2/mysql/mysql-connector-java/5.
 mysql_jar=mysql-connector-java-5.1.39.jar
 ranger_version=$5
 s3bucket_http_url=$6
-if [ "$ranger_version" == "0.6" ]; then
+if [ "$ranger_version" == "0.7" ]; then
+   ranger_s3bucket=$s3bucket_http_url/ranger/ranger-0.7.1
+   ranger_admin_server=ranger-0.7.1-admin
+   ranger_user_sync=ranger-0.7.1-usersync
+elif [ "$ranger_version" == "0.6" ]; then
    ranger_s3bucket=$s3bucket_http_url/ranger/ranger-0.6.1
    ranger_admin_server=ranger-0.6.1-admin
    ranger_user_sync=ranger-0.6.1-usersync
@@ -106,9 +110,9 @@ done
 /usr/bin/ranger-usersync stop || true
 /usr/bin/ranger-usersync start
 # The default usersync runs every 1 hour (cannot be changed). This is way to force usersync
-sudo echo /usr/bin/ranger-usersync restart | at now + 5 minutes
-sudo echo /usr/bin/ranger-usersync restart | at now + 7 minutes
-sudo echo /usr/bin/ranger-usersync restart | at now + 10 minutes
+#sudo echo /usr/bin/ranger-usersync restart | at now + 5 minutes
+#sudo echo /usr/bin/ranger-usersync restart | at now + 7 minutes
+#sudo echo /usr/bin/ranger-usersync restart | at now + 10 minutes
 #Start SOLR
 #/opt/solr/bin/solr stop -p 8983 || true
 #/opt/solr/bin/solr start

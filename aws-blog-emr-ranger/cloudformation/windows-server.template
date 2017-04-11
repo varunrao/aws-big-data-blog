@@ -101,16 +101,6 @@
                 "directoryName": "{{ directoryName }}",
                 "dnsIpAddresses": "{{ dnsIpAddresses }}"
               }
-            },
-            "aws:psModule": {
-              "properties": [
-                {
-                  "description": "Run the create users command.",
-                  "runCommand": [
-                    "iex -Command 'C:\\create-simple-ad-users.ps1'"
-                  ]
-                }
-              ]
             }
           }
         }

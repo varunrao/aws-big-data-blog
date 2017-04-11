@@ -10,7 +10,11 @@ mysql_jar_location=http://central.maven.org/maven2/mysql/mysql-connector-java/5.
 mysql_jar=mysql-connector-java-5.1.39.jar
 ranger_version=$2
 s3bucket=$3
-if [ "$ranger_version" == "0.6" ]; then
+if [ "$ranger_version" == "0.7" ]; then
+   ranger_s3bucket=$s3bucket/ranger/ranger-0.7.1
+   ranger_hdfs_plugin=ranger-0.7.1-hdfs-plugin
+   ranger_hive_plugin=ranger-0.7.1-hive-plugin
+elif [ "$ranger_version" == "0.6" ]; then
    ranger_s3bucket=$s3bucket/ranger/ranger-0.6.1
    ranger_hdfs_plugin=ranger-0.6.1-hdfs-plugin
    ranger_hive_plugin=ranger-0.6.1-hive-plugin

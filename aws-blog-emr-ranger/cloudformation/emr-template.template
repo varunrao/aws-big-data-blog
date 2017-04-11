@@ -77,7 +77,7 @@
             "Default": "0.6",
             "Description": "Version of the Ranger Server.",
             "Type": "String",
-            "AllowedValues" : ["0.6"]
+            "AllowedValues" : ["0.6", "0.7"]
         },
        "s3artifactsRepo": {
 	       "Default": "s3://aws-bigdata-blog/artifacts/aws-blog-emr-ranger",
@@ -97,6 +97,9 @@
                     },
                     {
                         "Name": "Hue"
+                    },
+                    {
+                        "Name": "Zeppelin"
                     }
                 ],
                 "BootstrapActions": [
@@ -357,26 +360,6 @@
                     "Ref": "EMRSampleCluster"
                 },
                 "Name": "SparkStep"
-            },
-            "Type": "AWS::EMR::Step"
-        },
-        "UpdateHueLdapServer": {
-            "Properties": {
-                "ActionOnFailure": "CONTINUE",
-                "HadoopJarStep": {
-                    "Args": [
-                        "/mnt/tmp/aws-blog-emr-ranger/scripts/emr-steps/updateHueLdapUrl.sh",
-                        {
-                            "Ref": "LDAPServerIP"
-                        }
-                    ],
-                    "Jar": "s3://elasticmapreduce/libs/script-runner/script-runner.jar",
-                    "MainClass": ""
-                },
-                "JobFlowId": {
-                    "Ref": "EMRSampleCluster"
-                },
-                "Name": "UpdateHueLdapServer"
             },
             "Type": "AWS::EMR::Step"
         }
