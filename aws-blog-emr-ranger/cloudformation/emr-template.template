@@ -74,7 +74,7 @@
             "Type": "String"
         },
         "rangerVersion": {
-            "Default": "0.6",
+            "Default": "0.7",
             "Description": "Version of the Ranger Server.",
             "Type": "String",
             "AllowedValues" : ["0.6", "0.7"]

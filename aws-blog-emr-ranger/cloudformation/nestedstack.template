@@ -22,10 +22,6 @@
       "Description": "Subnet for EMR cluster and Ranger Server",
       "Type": "AWS::EC2::Subnet::Id"
     },
-    "SubnetWindowsEC2Instance": {
-      "Description": "Subnet to launch Windows EC2 instance. Specify Public Subnet if you plan to use this as a Bastion Host",
-      "Type": "AWS::EC2::Subnet::Id"
-    },
     "Subnet1SimpleAD": {
       "Description": "Subnet ID1 for creating the SimpleAD",
       "Type": "AWS::EC2::Subnet::Id"
@@ -64,7 +60,8 @@
     },
     "EMRLogDir": {
       "Description": "Log Dir for the EMR cluster. Eg: s3://xxx",
-      "Type": "String"
+      "Type": "String",
+      "AllowedPattern": "^s3://.*"
     },
     "MasterInstanceType": {
       "Default": "m3.2xlarge",
@@ -93,7 +90,7 @@
       "Description": "RangerVersion. Expected values are : 0.6. NOTE: Use Ranger 0.6 if EMR version is 5.0",
       "AllowedValues" : ["0.6","0.7"],
       "Type": "String",
-      "Default": "0.6"
+      "Default": "0.7"
     },
     "emrReleaseLabel": {
       "Description": "EMR Version. Pick Ranger 0.6 if EMR version is 5.0 or higher",
@@ -102,15 +99,41 @@
       "Default": "emr-5.4.0"
     },
     "s3artifactsRepoHttp": {
-       "Default": "https://s3.amazonaws.com/test-emr-security",
+       "Default": "https://s3.amazonaws.com/aws-bigdata-blog/artifacts/aws-blog-emr-ranger",
        "Description": "HTTP location of the repo.",
        "Type": "String"
      },
      "s3artifactsRepo": {
-	       "Default": "s3://test-emr-security",
+	       "Default": "s3://aws-bigdata-blog/artifacts/aws-blog-emr-ranger",
 	       "Description": "S3 location of the repo.",
 	       "Type": "String"
      }
+  },
+  "Metadata" : {
+    "AWS::CloudFormation::Interface" : {
+      "ParameterGroups" : [
+        {
+          "Label" : { "default" : "Artifacts repo" },
+          "Parameters" : [ "s3artifactsRepoHttp", "s3artifactsRepo"]
+        },
+        {
+          "Label" : { "default" : "Network Configuration" },
+          "Parameters" : [ "VPC", "Subnet1SimpleAD", "Subnet2SimpleAD", "KeyName", "DefaultSubnet"]
+        },
+        {
+          "Label" : { "default":"Domain Information" },
+          "Parameters" : [ "DomainName", "DomainShortName", "DomainPassword", "myDirectoryBaseDN", "myDirectoryBindUser", "myDirectoryBindPassword"]
+        },
+        {
+          "Label" : { "default":"Ranger Information" },
+          "Parameters" : [ "rangerVersion", "RangerInstanceType"]
+        },
+        {
+          "Label" : { "default":"EMR Information" },
+          "Parameters" : [ "emrReleaseLabel", "EMRClusterName", "EMRLogDir", "CoreInstanceType", "MasterInstanceType", "CoreInstanceCount"]
+        }
+      ]
+    }
   },
   "Resources": {
     "SimpleAD": {
@@ -131,49 +154,10 @@
         "TimeoutInMinutes": "60"
       }
     },
-    "WindowsInstance": {
-      "Type": "AWS::CloudFormation::Stack",
-      "DependsOn": [
-        "SimpleAD"
-      ],
-      "Properties": {
-        "TemplateURL": {"Fn::Join": ["", [{"Ref" : "s3artifactsRepoHttp"},"/cloudformation/windows-server.template"]]},
-        "Parameters": {
-          "VPC": {
-            "Ref": "VPC"
-          },
-          "KeyName": {
-            "Ref": "KeyName"
-          },
-          "Subnet": {
-            "Ref": "SubnetWindowsEC2Instance"
-          },
-          "myDirectoryDomain": {
-            "Ref": "DomainName"
-          },
-          "myDirectoryId": {
-            "Fn::GetAtt": [
-              "SimpleAD",
-              "Outputs.SimpleADDomainID"
-            ]
-          },
-          "myDirectoryIPAddresses": {
-            "Fn::GetAtt": [
-              "SimpleAD",
-              "Outputs.SimpleADIPAddress"
-            ]
-          },
-          "s3artifactsRepoHttp": {
-            "Ref": "s3artifactsRepoHttp"
-          }
-        },
-        "TimeoutInMinutes": "60"
-      }
-    },
     "RangerServer": {
       "Type": "AWS::CloudFormation::Stack",
       "DependsOn": [
-        "WindowsInstance"
+        "SimpleAD"
       ],
       "Properties": {
         "TemplateURL": {"Fn::Join": ["", [{"Ref" : "s3artifactsRepoHttp"},"/cloudformation/ranger-server.template"]]},
@@ -222,6 +206,9 @@
         "TemplateURL": {"Fn::Join": ["", [{"Ref" : "s3artifactsRepoHttp"},"/cloudformation/emr-template.template"]]},
         "Parameters": {
           "myDirectoryBindUser": {"Ref" : "myDirectoryBindUser"},
+          "myDirectoryBindPassword": {
+            "Ref": "myDirectoryBindPassword"
+          },
           "emrReleaseLabel": {"Ref" : "emrReleaseLabel"},
           "emrReleaseLabel": {"Ref" : "emrReleaseLabel"},
           "rangerVersion": {"Ref" : "rangerVersion"},

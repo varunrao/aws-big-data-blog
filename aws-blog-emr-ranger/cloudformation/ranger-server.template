@@ -100,7 +100,7 @@
     "rangerVersion": {
       "Description": "RangerVersion",
       "Type": "String",
-      "Default": "0.6",
+      "Default": "0.7",
       "AllowedValues" : ["0.6", "0.7"]
     },
     "s3artifactsRepoHttp": {
