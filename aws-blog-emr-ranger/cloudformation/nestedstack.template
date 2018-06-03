@@ -94,17 +94,17 @@
     },
     "emrReleaseLabel": {
       "Description": "EMR Version. Pick Ranger 0.6 if EMR version is 5.0 or higher",
-      "AllowedValues" : ["emr-5.0.0","emr-5.4.0"],
+      "AllowedValues" : ["emr-5.0.0","emr-5.4.0", "emr-5.10.0"],
       "Type": "String",
       "Default": "emr-5.4.0"
     },
     "s3artifactsRepoHttp": {
-       "Default": "https://s3.amazonaws.com/aws-bigdata-blog/artifacts/aws-blog-emr-ranger",
+       "Default": "https://s3.amazonaws.com/test-emr-security",
        "Description": "HTTP location of the repo.",
        "Type": "String"
      },
      "s3artifactsRepo": {
-	       "Default": "s3://aws-bigdata-blog/artifacts/aws-blog-emr-ranger",
+	       "Default": "s3://test-emr-security",
 	       "Description": "S3 location of the repo.",
 	       "Type": "String"
      }
@@ -160,7 +160,7 @@
         "SimpleAD"
       ],
       "Properties": {
-        "TemplateURL": {"Fn::Join": ["", [{"Ref" : "s3artifactsRepoHttp"},"/cloudformation/ranger-server.template"]]},
+        "TemplateURL": {"Fn::Join": ["", [{"Ref" : "s3artifactsRepoHttp"},"/cloudformation/ranger-server-new.template"]]},
         "Parameters": {
           "VPC": {
             "Ref": "VPC"
@@ -203,7 +203,7 @@
         "RangerServer"
       ],
       "Properties": {
-        "TemplateURL": {"Fn::Join": ["", [{"Ref" : "s3artifactsRepoHttp"},"/cloudformation/emr-template.template"]]},
+        "TemplateURL": {"Fn::Join": ["", [{"Ref" : "s3artifactsRepoHttp"},"/cloudformation/emr-template-new.template"]]},
         "Parameters": {
           "myDirectoryBindUser": {"Ref" : "myDirectoryBindUser"},
           "myDirectoryBindPassword": {

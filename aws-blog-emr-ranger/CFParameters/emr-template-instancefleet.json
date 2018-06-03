@@ -1,0 +1,14 @@
+{
+  "StackName": "EMRInstanceFleet",
+  "Parameters": {
+    "CoreInstanceCount": "3",
+    "CoreInstanceType": "m3.2xlarge",
+    "EMRClusterName": "SecurityPOCCluster",
+    "EMRLogDir": "s3://emr-dp-logs/",
+    "emrReleaseLabel": "emr-5.7.0",
+    "KeyName": "gcp-css",
+    "MasterInstanceType": "m3.2xlarge",
+    "Subnet": "subnet-c2a0428b",
+    "VPC": "vpc-b977ebde"
+  }
+}

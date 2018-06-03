@@ -1,0 +1,26 @@
+{
+  "StackName" : "EMRSecurity2",
+  "Parameters": {
+    "DomainName": "corp.emr.local",
+    "DomainPassword": "Password@123",
+    "DomainShortName":"EmrSimpleAD",
+    "DefaultSubnet": "subnet-c4a0428d",
+    "Subnet1SimpleAD": "subnet-c4a0428d",
+    "Subnet2SimpleAD": "subnet-a2bf8dfa",
+    "VPC": "vpc-b977ebde",
+    "KeyName": "gcp-css",
+    "CoreInstanceCount": "3",
+    "RangerInstanceType": "m4.xlarge",
+    "CoreInstanceType": "m3.2xlarge",
+    "EMRClusterName":"SecurityPOCCluster",
+    "EMRLogDir": "s3://emr-dp-logs/",
+    "MasterInstanceType":"m3.2xlarge",
+    "myDirectoryBaseDN":"dc=corp,dc=emr,dc=local",
+    "myDirectoryBindUser": "binduser@corp.emr.local",
+    "myDirectoryBindPassword": "Bind@User123",
+    "rangerVersion": "0.7",
+    "emrReleaseLabel": "emr-5.10.0",
+    "s3artifactsRepoHttp": "https://s3.amazonaws.com/test-emr-security",
+    "s3artifactsRepo": "s3://test-emr-security"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "StackName": "EMRBasic",
+  "Parameters": {
+    "CoreInstanceCount": "3",
+    "CoreInstanceType": "m3.2xlarge",
+    "EMRClusterName": "SecurityPOCCluster",
+    "EMRLogDir": "s3://emr-dp-logs/",
+    "emrReleaseLabel": "emr-5.7.0",
+    "KeyName": "varun1-enterprise-us-east-1",
+    "MasterInstanceType": "m3.2xlarge",
+    "Subnet": "subnet-9ee25bc3",
+    "VPC": "vpc-a0a9fad8",
+    "DeployRStudio": "false"
+  }
+}

@@ -1,0 +1,103 @@
+Description: CloudFormation template for creating an EMR cluster
+Outputs:
+  IPAddress:
+    Description: IP address of EMR cluster MasterNode
+    Value: !GetAtt [EMRSampleCluster, MasterPublicDNS]
+Parameters:
+  CoreInstanceCount:
+    Default: '3'
+    Description: Number of core instances
+    Type: Number
+  CoreInstanceType:
+    Default: m3.2xlarge
+    Description: Instance Type of the core node
+    Type: String
+  EMRClusterName:
+    Default: SecurityPOCCluster
+    Description: Cluster name for the EMR
+    Type: String
+  EMRLogDir:
+    Description: Log Dir for the EMR cluster
+    Type: String
+  KeyName:
+    Description: Name of an existing EC2 KeyPair to enable SSH to the instances
+    Type: AWS::EC2::KeyPair::KeyName
+  MasterInstanceType:
+    Default: m3.2xlarge
+    Description: Instance Type of the master node
+    Type: String
+  Subnet:
+    Description: Subnet ID for creating the EMR cluster
+    Type: AWS::EC2::Subnet::Id
+  VPC:
+    Description: VPC ID for creating the EMR cluster
+    Type: AWS::EC2::VPC::Id
+  emrReleaseLabel:
+    Default: emr-5.0.0
+    Description: Release label for the EMR cluster
+    Type: String
+Resources:
+  EMRSampleCluster:
+    Properties:
+      Applications:
+      - Name: Hive
+      - Name: Spark
+      - Name: Hue
+      - Name: Zeppelin
+      - Name: Presto
+      Instances:
+        Ec2KeyName: !Ref 'KeyName'
+        Ec2SubnetId: !Ref 'Subnet'
+        CoreInstanceFleet:
+          InstanceTypeConfigs:
+            - InstanceType: !Ref 'CoreInstanceType'
+          TargetOnDemandCapacity: !Ref 'CoreInstanceCount'
+        MasterInstanceFleet:
+          InstanceTypeConfigs:
+            - InstanceType: !Ref 'MasterInstanceType'
+          TargetOnDemandCapacity: 1
+        TerminationProtected: 'false'
+      JobFlowRole: EMR_EC2_DefaultRole
+      LogUri: !Ref 'EMRLogDir'
+      Name: !Ref 'EMRClusterName'
+      ReleaseLabel: !Ref 'emrReleaseLabel'
+      ServiceRole: EMR_DefaultRole
+      Tags:
+      - Key: Name
+        Value: EMR Sample Cluster
+      VisibleToAllUsers: 'true'
+    Type: AWS::EMR::Cluster
+  SparkStep:
+    Properties:
+      ActionOnFailure: CONTINUE
+      HadoopJarStep:
+        Args:
+        - spark-submit
+        - --deploy-mode
+        - cluster
+        - --class
+        - org.apache.spark.examples.SparkPi
+        - /usr/lib/spark/examples/jars/spark-examples.jar
+        - '10'
+        Jar: command-runner.jar
+        MainClass: ''
+      JobFlowId: !Ref 'EMRSampleCluster'
+      Name: SparkStep
+    Type: AWS::EMR::Step
+  EMRSampleClusterInstanceFleetTask:
+    Type: "AWS::EMR::InstanceFleetConfig"
+    Properties:
+      ClusterId: !Ref 'EMRSampleCluster'
+      InstanceFleetType: TASK
+      InstanceTypeConfigs:
+        - BidPrice: 0.5
+          BidPriceAsPercentageOfOnDemandPrice: Double
+          InstanceType: m3.xlarge
+          WeightedCapacity: 3
+        - BidPriceAsPercentageOfOnDemandPrice: 40
+          InstanceType: m4.2xlarge
+          WeightedCapacity: 5
+      LaunchSpecifications:
+        SpotSpecification:
+          TimeoutAction: SWITCH_TO_ON_DEMAND
+          TimeoutDurationMinutes: 120

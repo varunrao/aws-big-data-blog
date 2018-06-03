@@ -1,0 +1,12 @@
+{
+  "StackName": "ADDomainController",
+  "Parameters": {
+    "CrossRealmTrustPrincipalPassword": "Trust@Password",
+    "DomainAdminPassword": "Password@123",
+    "KeyName": "gcp-css",
+    "TypeOfInstance": "m3.2xlarge",
+    "Subnet": "subnet-c4a0428d",
+    "VPC": "vpc-b977ebde",
+    "SecurityGroup": "sg-273b7f52"
+  }
+}

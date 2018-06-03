@@ -1,0 +1,159 @@
+Description: CloudFormation template for creating an EMR cluster
+Outputs:
+  IPAddress:
+    Description: IP address of EMR cluster MasterNode
+    Value: !GetAtt [EMRSampleCluster, MasterPublicDNS]
+Parameters:
+  CoreInstanceCount:
+    Default: '3'
+    Description: Number of core instances
+    Type: Number
+  TaskMinCapacity:
+    Default: '1'
+    Description: Min Number of task instances
+    Type: Number
+  TaskMaxCapacity:
+    Default: '10'
+    Description: Max Number of task instances
+    Type: Number
+  CoreInstanceType:
+    Default: m3.2xlarge
+    Description: Instance Type of the core node
+    Type: String
+  TaskInstanceType:
+    Default: m3.2xlarge
+    Description: Instance Type of the task node
+    Type: String
+  EMRClusterName:
+    Default: SecurityPOCCluster
+    Description: Cluster name for the EMR
+    Type: String
+  EMRLogDir:
+    Description: Log Dir for the EMR cluster
+    Type: String
+  KeyName:
+    Description: Name of an existing EC2 KeyPair to enable SSH to the instances
+    Type: AWS::EC2::KeyPair::KeyName
+  MasterInstanceType:
+    Default: m3.2xlarge
+    Description: Instance Type of the master node
+    Type: String
+  Subnet:
+    Description: Subnet ID for creating the EMR cluster
+    Type: AWS::EC2::Subnet::Id
+  VPC:
+    Description: VPC ID for creating the EMR cluster
+    Type: AWS::EC2::VPC::Id
+  emrReleaseLabel:
+    Default: emr-5.0.0
+    Description: Release label for the EMR cluster
+    Type: String
+Resources:
+  EMRSampleCluster:
+    Properties:
+      AutoScalingRole: EMR_AutoScaling_DefaultRole
+      Applications:
+      - Name: Hive
+      - Name: Spark
+      Instances:
+        CoreInstanceGroup:
+          EbsConfiguration:
+            EbsBlockDeviceConfigs:
+            - VolumeSpecification:
+                SizeInGB: '10'
+                VolumeType: gp2
+              VolumesPerInstance: '1'
+            EbsOptimized: 'true'
+          InstanceCount: !Ref 'CoreInstanceCount'
+          InstanceType: !Ref 'CoreInstanceType'
+          Market: ON_DEMAND
+          Name: Core Instance
+        Ec2KeyName: !Ref 'KeyName'
+        Ec2SubnetId: !Ref 'Subnet'
+        MasterInstanceGroup:
+          InstanceCount: '1'
+          InstanceType: !Ref 'MasterInstanceType'
+          Market: ON_DEMAND
+          Name: Master Instance
+        TerminationProtected: 'false'
+      JobFlowRole: EMR_EC2_DefaultRole
+      LogUri: !Ref 'EMRLogDir'
+      Name: !Ref 'EMRClusterName'
+      ReleaseLabel: !Ref 'emrReleaseLabel'
+      ServiceRole: EMR_DefaultRole
+      Tags:
+      - Key: Name
+        Value: EMR Sample Cluster
+      VisibleToAllUsers: 'true'
+    Type: AWS::EMR::Cluster
+  MyInstanceGroupConfig:
+    Type: 'AWS::EMR::InstanceGroupConfig'
+    Properties:
+      InstanceCount: 1
+      InstanceType: !Ref TaskInstanceType
+      InstanceRole: TASK
+      Market: ON_DEMAND
+      Name: cfnTask
+      JobFlowId: !Ref EMRSampleCluster
+      AutoScalingPolicy:
+        Constraints:
+          MinCapacity: !Ref TaskMinCapacity
+          MaxCapacity: !Ref TaskMaxCapacity
+        Rules:
+          - Name: Scale-out
+            Description: Scale-out policy
+            Action:
+              SimpleScalingPolicyConfiguration:
+                AdjustmentType: CHANGE_IN_CAPACITY
+                ScalingAdjustment: 1
+                CoolDown: 300
+            Trigger:
+              CloudWatchAlarmDefinition:
+                Dimensions:
+                  - Key: JobFlowId
+                    Value: '${emr.clusterId}'
+                EvaluationPeriods: 1
+                Namespace: AWS/ElasticMapReduce
+                Period: 300
+                ComparisonOperator: LESS_THAN
+                Statistic: AVERAGE
+                Threshold: 90
+                Unit: PERCENT
+                MetricName: YARNMemoryAvailablePercentage
+          - Name: Scale-in
+            Description: Scale-in policy
+            Action:
+              SimpleScalingPolicyConfiguration:
+                AdjustmentType: CHANGE_IN_CAPACITY
+                ScalingAdjustment: -1
+                CoolDown: 300
+            Trigger:
+              CloudWatchAlarmDefinition:
+                Dimensions:
+                  - Key: JobFlowId
+                    Value: '${emr.clusterId}'
+                EvaluationPeriods: 1
+                Namespace: AWS/ElasticMapReduce
+                Period: 300
+                ComparisonOperator: GREATER_THAN
+                Statistic: AVERAGE
+                Threshold: 95
+                Unit: PERCENT
+                MetricName: YARNMemoryAvailablePercentage
+  SparkStep:
+    Properties:
+      ActionOnFailure: CONTINUE
+      HadoopJarStep:
+        Args:
+        - spark-submit
+        - --deploy-mode
+        - cluster
+        - --class
+        - org.apache.spark.examples.SparkPi
+        - /usr/lib/spark/examples/jars/spark-examples.jar
+        - '10'
+        Jar: command-runner.jar
+        MainClass: ''
+      JobFlowId: !Ref 'EMRSampleCluster'
+      Name: SparkStep
+    Type: AWS::EMR::Step
