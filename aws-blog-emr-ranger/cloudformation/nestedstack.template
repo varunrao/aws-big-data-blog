@@ -88,23 +88,23 @@
     },
     "rangerVersion": {
       "Description": "RangerVersion. Expected values are : 0.6. NOTE: Use Ranger 0.6 if EMR version is 5.0",
-      "AllowedValues" : ["0.6","0.7"],
+      "AllowedValues" : ["0.6","0.7","1.0"],
       "Type": "String",
       "Default": "0.7"
     },
     "emrReleaseLabel": {
       "Description": "EMR Version. Pick Ranger 0.6 if EMR version is 5.0 or higher",
-      "AllowedValues" : ["emr-5.0.0","emr-5.4.0", "emr-5.10.0"],
+      "AllowedValues" : ["emr-5.0.0","emr-5.4.0","emr-5.14.0","emr-5.16.0"],
       "Type": "String",
       "Default": "emr-5.4.0"
     },
     "s3artifactsRepoHttp": {
-       "Default": "https://s3.amazonaws.com/test-emr-security",
+       "Default": "https://s3.amazonaws.com/aws-bigdata-blog/artifacts/aws-blog-emr-ranger",
        "Description": "HTTP location of the repo.",
        "Type": "String"
      },
      "s3artifactsRepo": {
-	       "Default": "s3://test-emr-security",
+	       "Default": "s3://aws-bigdata-blog/artifacts/aws-blog-emr-ranger",
 	       "Description": "S3 location of the repo.",
 	       "Type": "String"
      }
