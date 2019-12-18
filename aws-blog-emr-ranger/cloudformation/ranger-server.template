@@ -101,7 +101,7 @@
       "Description": "RangerVersion",
       "Type": "String",
       "Default": "0.7",
-      "AllowedValues" : ["0.6", "0.7"]
+      "AllowedValues" : ["0.6", "0.7", "1.0"]
     },
     "s3artifactsRepoHttp": {
        "Default": "https://s3.amazonaws.com/aws-bigdata-blog/artifacts/aws-blog-emr-ranger",

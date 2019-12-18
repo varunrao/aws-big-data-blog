@@ -101,7 +101,7 @@
       "Description": "RangerVersion",
       "Type": "String",
       "Default": "0.7",
-      "AllowedValues" : ["0.6", "0.7"]
+      "AllowedValues" : ["0.6", "0.7","1.0"]
     },
     "s3artifactsRepoHttp": {
        "Default": "https://s3.amazonaws.com/aws-bigdata-blog/artifacts/aws-blog-emr-ranger",
@@ -337,7 +337,7 @@
               [
                 "#!/bin/bash\n",
                 "cd /tmp\n",
-                "wget ", 
+                "wget ",
                 	{"Ref": "s3artifactsRepoHttp"},
                  "/scripts/install-ranger-admin-server-new.sh\n",
                  "yum update aws-cfn-bootstrap\n",

@@ -1,6 +1,8 @@
 #!/bin/bash
 set -euo pipefail
 set -x
+sudo yum -y install java-1.8.0
+sudo yum -y remove java-1.7.0-openjdk
 export JAVA_HOME=/usr/lib/jvm/jre
 # Define variables
 hostname=`hostname -I | xargs`
@@ -9,7 +11,11 @@ mysql_jar_location=http://central.maven.org/maven2/mysql/mysql-connector-java/5.
 mysql_jar=mysql-connector-java-5.1.39.jar
 ranger_version=$5
 s3bucket_http_url=$6
-if [ "$ranger_version" == "0.7" ]; then
+if [ "$ranger_version" == "1.0" ]; then
+   ranger_s3bucket=$s3bucket_http_url/ranger/ranger-1.1.0
+   ranger_admin_server=ranger-1.1.0-admin
+   ranger_user_sync=ranger-1.1.0-usersync
+elif [ "$ranger_version" == "0.7" ]; then
    ranger_s3bucket=$s3bucket_http_url/ranger/ranger-0.7.1
    ranger_admin_server=ranger-0.7.1-admin
    ranger_user_sync=ranger-0.7.1-usersync
@@ -34,12 +40,16 @@ wget $s3bucket_http_url/inputdata/load-users-new.ldf
 wget $s3bucket_http_url/inputdata/modify-users-new.ldf
 wget $s3bucket_http_url/scripts/create-users-using-ldap.sh
 chmod +x create-users-using-ldap.sh
-./create-users-using-ldap.sh $ldap_ip_address
+./create-users-using-ldap.sh $ldap_ip_address || true
 #Install mySQL
 yum -y install mysql-server
 service mysqld start
 chkconfig mysqld on
 mysqladmin -u root password rangeradmin || true
+mysql -u root -prangeradmin -e "CREATE USER 'rangeradmin'@'localhost' IDENTIFIED BY 'rangeradmin';" || true
+mysql -u root -prangeradmin -e "create database ranger;" || true
+mysql -u root -prangeradmin -e "GRANT ALL PRIVILEGES ON *.* TO 'rangeradmin'@'localhost' IDENTIFIED BY 'rangeradmin'" || true
+mysql -u root -prangeradmin -e "FLUSH PRIVILEGES;" || true
 rm -rf $installpath
 mkdir -p $installpath/hadoop
 cd $installpath

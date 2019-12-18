@@ -3,10 +3,10 @@
   "Parameters": {
     "CrossRealmTrustPrincipalPassword": "Trust@Password",
     "DomainAdminPassword": "Password@123",
-    "KeyName": "gcp-css",
     "TypeOfInstance": "m3.2xlarge",
-    "Subnet": "subnet-c4a0428d",
-    "VPC": "vpc-b977ebde",
-    "SecurityGroup": "sg-273b7f52"
+    "VPC": "vpc-a0a9fad8",
+    "Subnet": "subnet-9ee25bc3",
+    "KeyName": "varun1-enterprise-us-east-1",
+    "SecurityGroup": "sg-00e9cc8c48467c02e"
   }
 }

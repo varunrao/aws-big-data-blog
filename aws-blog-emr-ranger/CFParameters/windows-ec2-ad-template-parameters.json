@@ -1,0 +1,15 @@
+{
+  "StackName": "WindowsADServer",
+  "Parameters": {
+    "VPC": "vpc-016a1c222c73fc5f1",
+    "Subnet": "subnet-0aa317fe1831cfe0e",
+    "KeyName": "varun1-enterprise-us-east-1",
+    "DomainDNSName": "awsemr.com",
+    "ADServerNetBIOSName": "DC1",
+    "DomainNetBIOSName": "AWSEMR",
+    "DomainAdminUser": "awsadmin",
+    "DomainAdminPassword": "Password@123",
+    "CrossRealmTrustPrincipalPassword": "CheckSum123",
+    "KerberosRealm": "EC2.INTERNAL"
+  }
+}

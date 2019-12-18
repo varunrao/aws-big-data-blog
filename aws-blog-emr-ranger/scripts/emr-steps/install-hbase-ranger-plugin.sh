@@ -10,7 +10,11 @@ mysql_jar_location=http://central.maven.org/maven2/mysql/mysql-connector-java/5.
 mysql_jar=mysql-connector-java-5.1.39.jar
 ranger_version=$2
 s3bucket=$3
-if [ "$ranger_version" == "0.7" ]; then
+if [ "$ranger_version" == "1.0" ]; then
+   ranger_s3bucket=$s3bucket/ranger/ranger-1.1.0
+   ranger_hdfs_plugin=ranger-1.1.0-hbase-plugin
+   ranger_hive_plugin=ranger-1.1.0-hbase-plugin
+elif [ "$ranger_version" == "0.7" ]; then
    ranger_s3bucket=$s3bucket/ranger/ranger-0.7.1
    ranger_hbase_plugin=ranger-0.7.1-hbase-plugin
 elif [ "$ranger_version" == "0.6" ]; then
@@ -46,7 +50,7 @@ sudo sed -i "s|XAAUDIT.DB.IS_ENABLED=.*|XAAUDIT.DB.IS_ENABLED=true|g" install.pr
 sudo sed -i "s|XAAUDIT.DB.HOSTNAME=.*|XAAUDIT.DB.HOSTNAME=$ranger_fqdn|g" install.properties
 sudo -E bash enable-hbase-plugin.sh
 #Restart HBase service
-#sudo puppet apply -e 'service { "hbase-master": ensure => false, }' || true
-#sudo puppet apply -e 'service { "hbase-master": ensure => true, }' || true
-#sudo puppet apply -e 'service { "hbase-regionserver": ensure => false, }' || true
-#sudo puppet apply -e 'service { "hbase-regionserver": ensure => true, }' || true
+sudo puppet apply -e 'service { "hbase-master": ensure => false, }' || true
+sudo puppet apply -e 'service { "hbase-master": ensure => true, }' || true
+sudo puppet apply -e 'service { "hbase-regionserver": ensure => false, }' || true
+sudo puppet apply -e 'service { "hbase-regionserver": ensure => true, }' || true

@@ -24,18 +24,6 @@
           "AllowedValues" : ["Bind@User123"],
           "Default": "Bind@User123"
         },
-        "DomainName": {
-            "Default": "corp.emr.local",
-            "Description": "DomainName",
-            "AllowedValues" : ["corp.emr.local"],
-            "Type": "String"
-        },
-        "DomainPassword": {
-            "Default": "Password@123",
-            "Description": "DomainPassword",
-            "AllowedValues" : ["Password@123"],
-            "Type": "String"
-        },
         "CoreInstanceCount": {
             "Default": "3",
             "Description": "Number of core instances",
@@ -81,15 +69,16 @@
             "Type": "AWS::EC2::VPC::Id"
         },
         "emrReleaseLabel": {
-            "Default": "emr-5.0.0",
+            "Default": "emr-5.4.0",
+            "AllowedValues" : ["emr-5.0.0","emr-5.4.0", "emr-5.16.0", "emr-5.17.0"],
             "Description": "Release label for the EMR cluster",
             "Type": "String"
         },
         "rangerVersion": {
-            "Default": "0.6",
+            "Default": "0.7",
             "Description": "Version of the Ranger Server.",
             "Type": "String",
-            "AllowedValues" : ["0.6", "0.7"]
+            "AllowedValues" : ["0.6", "0.7", "1.0"]
         },
        "s3artifactsRepo": {
 	       "Default": "s3://aws-bigdata-blog/artifacts/aws-blog-emr-ranger",
@@ -97,6 +86,12 @@
 	       "Type": "String"
      	}
     },
+
+    "Conditions" : {
+            "emr-5.4" : {"Fn::Equals" : [{"Ref" : "emrReleaseLabel"}, "emr-5.4.0"]},
+            "emr-5.0" : {"Fn::Equals" : [{"Ref" : "emrReleaseLabel"}, "emr-5.0.0"]},
+            "OlderEmrVersion": {"Fn::Or": [{"Condition": "emr-5.4"}, {"Condition": "emr-5.0" }]}
+        },
     "Resources": {
         "EMRSampleCluster": {
             "Properties": {
@@ -119,50 +114,9 @@
                   			"Fn::Join": ["", [{"Ref" : "s3artifactsRepo"}, "/scripts/download-scripts.sh"]]},
                             "Args": [{ "Ref" : "s3artifactsRepo" }]
                         }
-                    },
-                    {
-                        "Name": "Join Instances to SimpleAD1",
-                        "ScriptBootstrapAction": {
-                            "Path": {
-                  			"Fn::Join": ["", [{"Ref" : "s3artifactsRepo"}, "/scripts/join-ad.sh"]]},
-                            "Args": [{ "Ref" : "LDAPServerIP" }, { "Ref" : "DomainName" }, "Administrator", { "Ref" : "DomainPassword" }]
-                        }
                     }
                 ],
-                "SecurityConfiguration" : "MySecurityConfiguration",
                 "Configurations": [
-                    {
-                        "Classification": "core-site",
-                        "ConfigurationProperties": {
-                          "hadoop.security.auth_to_local": { "Fn::Join": [
-                                                            "",
-                                                                [
-                                                                    "RULE:[1:$1@$0](.*@CORP.EMR.LOCAL)s/@.*//\n",
-                                                                    "DEFAULT"
-                                                                ]
-                                                            ]
-                                                        }
-                        }
-                    },
-                    {
-                        "Classification": "kms-site",
-                        "ConfigurationProperties": {
-                          "hadoop.kms.authentication.kerberos.name.rules": { "Fn::Join": [
-                                                            "",
-                                                                [
-                                                                    "RULE:[1:$1@$0](.*@AD.DOMAIN.COM)s/@.*//\n",
-                                                                    "DEFAULT"
-                                                                ]
-                                                            ]
-                                                        }
-                        }
-                    },
-                    {
-                        "Classification": "hdfs-site",
-                        "ConfigurationProperties": {
-                          "dfs.namenode.datanode.registration.ip-hostname-check": "false"
-                        }
-                    },
                     {
                         "Classification": "hue-ini",
                         "Configurations": [
@@ -179,7 +133,13 @@
                                         "Classification": "ldap",
                                         "ConfigurationProperties": {
                                             "base_dn": "dc=corp,dc=emr,dc=local",
-                                            "bind_dn": { "Ref" : "myDirectoryBindUser" },
+                                            "bind_dn": {
+                                                         "Fn::If" : [
+                                                           "OlderEmrVersion",
+                                                           { "Ref" : "myDirectoryBindUser" },
+                                                           { "Fn::Select" : [ "0", { "Fn::Split": ["@", { "Ref" : "myDirectoryBindUser" }]}] }
+                                                         ]
+                                                       },
                                             "bind_password": { "Ref" : "myDirectoryBindPassword" },
                                             "create_users_on_login": "true",
                                             "debug": "true",
@@ -222,7 +182,7 @@
                     {
                         "Classification": "core-site",
                         "ConfigurationProperties": {
-                              "hadoop.security.group.mapping": "org.apache.hadoop.security.LdapGroupsMapping",
+                                "hadoop.security.group.mapping": "org.apache.hadoop.security.LdapGroupsMapping",
                               "hadoop.security.group.mapping.ldap.bind.user": { "Ref" : "myDirectoryBindUser" },
                               "hadoop.security.group.mapping.ldap.bind.password": { "Ref" : "myDirectoryBindPassword" },
                               "hadoop.security.group.mapping.ldap.url": { "Fn::Join": [
@@ -307,8 +267,8 @@
                 "HadoopJarStep": {
                     "Args": [
                         "/mnt/tmp/aws-blog-emr-ranger/scripts/emr-steps/createHiveTables.sh",
-                        { 
-                          "Ref" : "AWS::Region" 
+                        {
+                          "Ref" : "AWS::Region"
                         }
                     ],
                     "Jar": "s3://elasticmapreduce/libs/script-runner/script-runner.jar",
@@ -376,8 +336,8 @@
                 "HadoopJarStep": {
                     "Args": [
                         "/mnt/tmp/aws-blog-emr-ranger/scripts/emr-steps/loadDataIntoHDFS.sh",
-                        { 
-                          "Ref" : "AWS::Region" 
+                        {
+                          "Ref" : "AWS::Region"
                         }
                     ],
                     "Jar": "s3://elasticmapreduce/libs/script-runner/script-runner.jar",

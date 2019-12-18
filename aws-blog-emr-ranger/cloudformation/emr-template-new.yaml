@@ -61,6 +61,7 @@ Parameters:
     AllowedValues:
     - '0.6'
     - '0.7'
+    - '1.0'
   s3artifactsRepo:
     Default: s3://aws-bigdata-blog/artifacts/aws-blog-emr-ranger
     Description: Git Repo URL for this blog.
@@ -80,13 +81,13 @@ Resources:
           Path: !Join ['', [!Ref 's3artifactsRepo', /scripts/download-scripts.sh]]
           Args:
           - !Ref 's3artifactsRepo'
-      - Name: Install Ranger S3 plugin
-        ScriptBootstrapAction:
-          Path: !Join ['', [!Ref 's3artifactsRepo', /scripts/install-s3-ranger-plugin.sh]]
-          Args:
-          - !Ref 's3artifactsRepo'
-          - !Ref 'rangerVersion'
-          - !Ref 'RangerHostname'
+#      - Name: Install Ranger S3 plugin
+#        ScriptBootstrapAction:
+#          Path: !Join ['', [!Ref 's3artifactsRepo', /scripts/install-s3-ranger-plugin.sh]]
+#          Args:
+#          - !Ref 's3artifactsRepo'
+#          - !Ref 'rangerVersion'
+#          - !Ref 'RangerHostname'
       Configurations:
       - Classification: hue-ini
         Configurations:

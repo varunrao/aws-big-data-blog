@@ -11,9 +11,9 @@ mysql_jar=mysql-connector-java-5.1.39.jar
 ranger_version=$2
 s3bucket=$3
 if [ "$ranger_version" == "1.0" ]; then
-   ranger_s3bucket=$s3bucket/ranger/ranger-1.1.0
-   ranger_hdfs_plugin=ranger-1.1.0-hdfs-plugin
-   ranger_hive_plugin=ranger-1.1.0-hive-plugin
+   ranger_s3bucket=$s3bucket_http_url/ranger/ranger-1.0.1
+   ranger_hdfs_plugin=ranger-1.0.1-hdfs-plugin
+   ranger_hive_plugin=ranger-1.0.1-hive-plugin
 elif [ "$ranger_version" == "0.7" ]; then
    ranger_s3bucket=$s3bucket/ranger/ranger-0.7.1
    ranger_hdfs_plugin=ranger-0.7.1-hdfs-plugin
@@ -39,8 +39,6 @@ tar -xvf $ranger_hdfs_plugin.tar.gz
 cd $installpath/$ranger_hdfs_plugin
 ln -s /etc/hadoop/conf $installpath/hadoop/conf
 ln -s /usr/lib/hadoop $installpath/hadoop/lib
-mkdir -p $installpath/hadoop/etc
-ln $installpath/hadoop/conf $installpath/hadoop/etc/hadoop
 #Update Ranger URL in HDFS conf
 sudo sed -i "s|POLICY_MGR_URL=.*|POLICY_MGR_URL=http://$ranger_fqdn:6080|g" install.properties
 sudo sed -i "s|XAAUDIT.DB.HOSTNAME=.*|XAAUDIT.DB.HOSTNAME=localhost|g" install.properties
@@ -54,9 +52,6 @@ sudo sed -i "s|XAAUDIT.SOLR.SOLR_URL=.*|XAAUDIT.SOLR.SOLR_URL=http://$ranger_fqd
 sudo sed -i "s|XAAUDIT.SOLR.ENABLE=.*|XAAUDIT.SOLR.ENABLE=true|g" install.properties
 sudo sed -i "s|XAAUDIT.DB.IS_ENABLED=.*|XAAUDIT.DB.IS_ENABLED=true|g" install.properties
 sudo sed -i "s|XAAUDIT.DB.HOSTNAME=.*|XAAUDIT.DB.HOSTNAME=$ranger_fqdn|g" install.properties
-if [ "$ranger_version" == "1.0" ]; then
-   sudo cp -r $installpath/$ranger_hdfs_plugin/lib/* $installpath/hadoop/lib/
-fi
 sudo -E bash enable-hdfs-plugin.sh
 #Update Ranger URL in Hive Conf
 mkdir -p $installpath/hive/lib

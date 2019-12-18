@@ -9,7 +9,11 @@ mysql_jar_location=http://central.maven.org/maven2/mysql/mysql-connector-java/5.
 mysql_jar=mysql-connector-java-5.1.39.jar
 ranger_version=$5
 s3bucket_http_url=$6
-if [ "$ranger_version" == "0.7" ]; then
+if [ "$ranger_version" == "1.0" ]; then
+   ranger_s3bucket=$s3bucket_http_url/ranger/ranger-1.0.1
+   ranger_admin_server=ranger-1.0.1-admin
+   ranger_user_sync=ranger-1.0.1-usersync
+elif [ "$ranger_version" == "0.7" ]; then
    ranger_s3bucket=$s3bucket_http_url/ranger/ranger-0.7.1
    ranger_admin_server=ranger-0.7.1-admin
    ranger_user_sync=ranger-0.7.1-usersync
@@ -48,7 +52,8 @@ wget $ranger_s3bucket/$ranger_user_sync.tar.gz
 wget $mysql_jar_location
 wget $ranger_s3bucket/solr_for_audit_setup.tar.gz
 #Update ranger admin install.properties
-tar -xvf $ranger_admin_server.tar.gz
+mkdir $ranger_admin_server
+tar -xvf $ranger_admin_server.tar.gz -C $ranger_admin_server --strip-components=1
 cd $ranger_admin_server
 sudo sed -i "s|SQL_CONNECTOR_JAR=.*|SQL_CONNECTOR_JAR=$installpath/$mysql_jar|g" install.properties
 sudo sed -i "s|db_root_password=.*|db_root_password=rangeradmin|g" install.properties
@@ -73,7 +78,8 @@ chmod +x setup.sh
 ./setup.sh
 #Update ranger usersync install.properties
 cd $installpath
-tar -xvf $ranger_user_sync.tar.gz
+mkdir $ranger_user_sync
+tar -xvf $ranger_user_sync.tar.gz -C $ranger_user_sync --strip-components=1
 cd $ranger_user_sync
 sudo sed -i "s|POLICY_MGR_URL =.*|POLICY_MGR_URL=http://$hostname:6080|g" install.properties
 sudo sed -i "s|SYNC_SOURCE =.*|SYNC_SOURCE=ldap|g" install.properties
@@ -89,7 +95,8 @@ chmod +x setup.sh
 ./setup.sh
 #Download the install solr for ranger
 cd $installpath
-tar -xvf solr_for_audit_setup.tar.gz
+mkdir solr_for_audit_setup
+tar -xvf solr_for_audit_setup.tar.gz -C solr_for_audit_setup --strip-components=1
 cd solr_for_audit_setup
 sudo sed -i "s|SOLR_HOST_URL=.*|SOLR_HOST_URL=http://$hostname:8983|g" install.properties
 sudo sed -i "s|SOLR_RANGER_PORT=.*|SOLR_RANGER_PORT=8983|g" install.properties
@@ -121,6 +128,6 @@ sudo /opt/solr/ranger_audit_server/scripts/start_solr.sh
 #Add the new awss3 configuration
 cd $installpath
 wget $s3bucket_http_url/inputdata/ranger-servicedef-s3.json
-sudo cp /usr/lib/ranger/ranger-0.7.1-admin/ews/webapp/WEB-INF/classes/ranger-plugins/hdfs/ranger-hdfs-plugin-0.7.1.jar /usr/lib/ranger/ranger-0.7.1-admin/ews/webapp/WEB-INF/classes/ranger-plugins/awss3/
+#sudo cp /usr/lib/ranger/ranger-0.7.1-admin/ews/webapp/WEB-INF/classes/ranger-plugins/hdfs/ranger-hdfs-plugin-0.7.1.jar /usr/lib/ranger/ranger-0.7.1-admin/ews/webapp/WEB-INF/classes/ranger-plugins/awss3/
 #curl -u admin:admin -X DELETE http://localhost:6080/service/public/v2/api/servicedef/name/awss3
 curl -u admin:admin -X POST -H "Accept: application/json" -H "Content-Type: application/json" http://localhost:6080/service/public/v2/api/servicedef -d @ranger-servicedef-s3.json

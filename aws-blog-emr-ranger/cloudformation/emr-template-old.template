@@ -1,5 +1,5 @@
 {
-    "Description": "Sample CloudFormation template for creating an EMR cluster",
+    "Description": "CloudFormation template for creating an EMR cluster",
     "Outputs": {
         "IPAddress": {
             "Description": "IP address of EMR cluster MasterNode",
@@ -12,6 +12,18 @@
         }
     },
     "Parameters": {
+        "myDirectoryBindUser": {
+          "Description": "BindUser Simple AD server",
+          "Type": "String",
+          "AllowedValues" : ["binduser@corp.emr.local"],
+          "Default": "binduser@corp.emr.local"
+        },
+        "myDirectoryBindPassword": {
+          "Description": "BindPassword Simple AD server",
+          "Type": "String",
+          "AllowedValues" : ["Bind@User123"],
+          "Default": "Bind@User123"
+        },
         "CoreInstanceCount": {
             "Default": "3",
             "Description": "Number of core instances",
@@ -28,7 +40,6 @@
             "Type": "String"
         },
         "EMRLogDir": {
-            "Default": "s3://security-poc/logs",
             "Description": "Log Dir for the EMR cluster",
             "Type": "String"
         },
@@ -46,7 +57,7 @@
             "Type": "String"
         },
         "RangerHostname": {
-            "Description": "Internal FQDN of the Ranger Server",
+            "Description": "Internal IP address of the Ranger Server",
             "Type": "String"
         },
         "Subnet": {
@@ -58,33 +69,22 @@
             "Type": "AWS::EC2::VPC::Id"
         },
         "emrReleaseLabel": {
-            "Default": "emr-5.0.0",
+            "Default": "emr-5.4.0",
+            "AllowedValues" : ["emr-5.0.0","emr-5.4.0", "emr-5.16.0", "emr-5.17.0"],
             "Description": "Release label for the EMR cluster",
             "Type": "String"
         },
         "rangerVersion": {
-            "Default": "0.6",
-            "Description": "Version of the Ranger Server. Values are 0.5 and 0.6",
-            "Type": "String"
+            "Default": "0.7",
+            "Description": "Version of the Ranger Server.",
+            "Type": "String",
+            "AllowedValues" : ["0.6", "0.7", "1.0"]
         },
-        "downloadScriptLocation": {
-            "Default": "s3://test-emr-security/scripts/download-scripts.sh",
-            "AllowedValues" : ["s3://test-emr-security/scripts/download-scripts.sh"],
-            "Description": "Default S3 location where the download scripts are placed.",
-            "Type": "String"
-     	},
-        "s3artifactsRepo": {
-            "Default": "s3://test-emr-security",
-            "AllowedValues" : ["s3://test-emr-security"],
-            "Description": "Default location where the artifacts are placed.",
-            "Type": "String"
-        },
-        "gitRepo": {
-            "Default": "https://github.com/varunrao/aws-big-data-blog/trunk/aws-blog-emr-ranger",
-            "AllowedValues" : ["https://github.com/varunrao/aws-big-data-blog/trunk/aws-blog-emr-ranger"],
-            "Description": "Git Repo URL path.",
-            "Type": "String"
-        }
+       "s3artifactsRepo": {
+	       "Default": "s3://aws-bigdata-blog/artifacts/aws-blog-emr-ranger",
+	       "Description": "Git Repo URL for this blog.",
+	       "Type": "String"
+     	}
     },
     "Resources": {
         "EMRSampleCluster": {
@@ -104,8 +104,9 @@
                     {
                         "Name": "Download scripts",
                         "ScriptBootstrapAction": {
-                            "Path": {"Ref" : "downloadScriptLocation"},
-                            "Args": [{ "Ref" : "gitRepo" }]
+                            "Path": {
+                  			"Fn::Join": ["", [{"Ref" : "s3artifactsRepo"}, "/scripts/download-scripts.sh"]]},
+                            "Args": [{ "Ref" : "s3artifactsRepo" }]
                         }
                     }
                 ],
@@ -126,13 +127,20 @@
                                         "Classification": "ldap",
                                         "ConfigurationProperties": {
                                             "base_dn": "dc=corp,dc=emr,dc=local",
-                                            "bind_dn": "binduser",
-                                            "bind_password": "Bind@User123",
+                                            "bind_dn": { "Ref" : "myDirectoryBindUser" },
+                                            "bind_password": { "Ref" : "myDirectoryBindPassword" },
                                             "create_users_on_login": "true",
                                             "debug": "true",
                                             "force_username_lowercase": "true",
                                             "ignore_username_case": "true",
-                                            "ldap_url": "ldap://10.0.2.153",
+                                            "ldap_url": { "Fn::Join": [
+                                                            "",
+                                                            [
+                                                                "ldap://",
+                                                                { "Ref" : "LDAPServerIP" }
+                                                            ]
+                                                        ]
+                                                        },
                                             "ldap_username_pattern": "uid=<username>,cn=users,dc=corp,dc=emr,dc=local",
                                             "nt_domain": "corp.emr.local",
                                             "search_bind_authentication": "false",
@@ -158,6 +166,27 @@
                                 ]
                             }
                         ]
+                    },
+                    {
+                        "Classification": "core-site",
+                        "ConfigurationProperties": {
+                                "hadoop.security.group.mapping": "org.apache.hadoop.security.LdapGroupsMapping",
+                              "hadoop.security.group.mapping.ldap.bind.user": { "Ref" : "myDirectoryBindUser" },
+                              "hadoop.security.group.mapping.ldap.bind.password": { "Ref" : "myDirectoryBindPassword" },
+                              "hadoop.security.group.mapping.ldap.url": { "Fn::Join": [
+                                                            "",
+                                                            [
+                                                                "ldap://",
+                                                                { "Ref" : "LDAPServerIP" }
+                                                            ]
+                                                        ]
+                                                        },
+                              "hadoop.security.group.mapping.ldap.base": "dc=corp,dc=emr,dc=local",
+                              "hadoop.security.group.mapping.ldap.search.filter.user": "(objectclass=*)",
+                              "hadoop.security.group.mapping.ldap.search.filter.group": "(objectclass=*)",
+                              "hadoop.security.group.mapping.ldap.search.attr.member": "member",
+                              "hadoop.security.group.mapping.ldap.search.attr.group.name": "cn"
+                        }
                     }
                 ],
                 "Instances": {
@@ -226,8 +255,8 @@
                 "HadoopJarStep": {
                     "Args": [
                         "/mnt/tmp/aws-blog-emr-ranger/scripts/emr-steps/createHiveTables.sh",
-                        { 
-                          "Ref" : "AWS::Region" 
+                        {
+                          "Ref" : "AWS::Region"
                         }
                     ],
                     "Jar": "s3://elasticmapreduce/libs/script-runner/script-runner.jar",
@@ -295,8 +324,8 @@
                 "HadoopJarStep": {
                     "Args": [
                         "/mnt/tmp/aws-blog-emr-ranger/scripts/emr-steps/loadDataIntoHDFS.sh",
-                        { 
-                          "Ref" : "AWS::Region" 
+                        {
+                          "Ref" : "AWS::Region"
                         }
                     ],
                     "Jar": "s3://elasticmapreduce/libs/script-runner/script-runner.jar",
@@ -329,26 +358,6 @@
                     "Ref": "EMRSampleCluster"
                 },
                 "Name": "SparkStep"
-            },
-            "Type": "AWS::EMR::Step"
-        },
-        "UpdateHueLdapServer": {
-            "Properties": {
-                "ActionOnFailure": "CONTINUE",
-                "HadoopJarStep": {
-                    "Args": [
-                        "/mnt/tmp/aws-blog-emr-ranger/scripts/emr-steps/updateHueLdapUrl.sh",
-                        {
-                            "Ref": "LDAPServerIP"
-                        }
-                    ],
-                    "Jar": "s3://elasticmapreduce/libs/script-runner/script-runner.jar",
-                    "MainClass": ""
-                },
-                "JobFlowId": {
-                    "Ref": "EMRSampleCluster"
-                },
-                "Name": "UpdateHueLdapServer"
             },
             "Type": "AWS::EMR::Step"
         }

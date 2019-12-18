@@ -77,7 +77,7 @@
             "Default": "0.7",
             "Description": "Version of the Ranger Server.",
             "Type": "String",
-            "AllowedValues" : ["0.6", "0.7"]
+            "AllowedValues" : ["0.6", "0.7","1.0"]
         },
        "s3artifactsRepo": {
 	       "Default": "s3://aws-bigdata-blog/artifacts/aws-blog-emr-ranger",
@@ -99,10 +99,10 @@
                         "Name": "Hue"
                     },
                     {
-                        "Name": "Zeppelin"
+                        "Name": "Presto"
                     },
                     {
-                        "Name": "Presto"
+                        "Name": "Livy"
                     }
                 ],
                 "BootstrapActions": [
@@ -113,14 +113,6 @@
                   			"Fn::Join": ["", [{"Ref" : "s3artifactsRepo"}, "/scripts/download-scripts.sh"]]},
                             "Args": [{ "Ref" : "s3artifactsRepo" }]
                         }
-                    },
-                    {
-                        "Name": "Install Ranger S3 plugin",
-                        "ScriptBootstrapAction": {
-                            "Path": {
-                            "Fn::Join": ["", [{"Ref" : "s3artifactsRepo"}, "/scripts/install-s3-ranger-plugin.sh"]]},
-                            "Args": [{ "Ref" : "s3artifactsRepo" }, { "Ref" : "rangerVersion" }, { "Ref" : "RangerHostname" }]
-                            }
                     }
                 ],
                 "Configurations": [
@@ -203,10 +195,25 @@
                     },
                     {
                         "Classification": "spark-hive-site",
-                        "ConfigurationProperties": {
+                        "ConfigurationProperties":
+                        {
                           "hive.metastore.client.factory.class": "com.amazonaws.glue.catalog.metastore.AWSGlueDataCatalogHiveClientFactory"
                         }
-                     }
+                    },
+                    {
+                        "Classification": "hive-site",
+                        "ConfigurationProperties":
+                        {
+                          "hive.metastore.client.factory.class": "com.amazonaws.glue.catalog.metastore.AWSGlueDataCatalogHiveClientFactory"
+                        }
+                    },
+                    {
+                        "Classification": "presto-connector-hive",
+                        "ConfigurationProperties":
+                          {
+                            "hive.metastore.glue.datacatalog.enabled": "true"
+                          }
+                    }
                 ],
                 "Instances": {
                     "CoreInstanceGroup": {
@@ -293,7 +300,7 @@
                 "ActionOnFailure": "CONTINUE",
                 "HadoopJarStep": {
                     "Args": [
-                        "/mnt/tmp/aws-blog-emr-ranger/scripts/emr-steps/install-hive-hdfs-ranger-plugin.sh",
+                        "/mnt/tmp/aws-blog-emr-ranger/scripts/emr-steps/install-hive-hdfs-ranger-plugin-new.sh",
                         {
                             "Ref": "RangerHostname"
                         },
